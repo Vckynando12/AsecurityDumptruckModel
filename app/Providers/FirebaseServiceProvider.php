@@ -14,8 +14,6 @@ class FirebaseServiceProvider extends ServiceProvider
         $this->app->singleton(FirebaseAuth::class, function ($app) {
             $factory = (new Factory)
             ->withServiceAccount(json_decode(env('FIREBASE_CREDENTIALS'), true))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'))
-            ->withServiceAccount(base_path('storage/app/firebase/smartcab-8bb42-firebase-adminsdk-fbsvc-de33a8e45b.json'))
             ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
 
             return $factory->createAuth();
@@ -24,10 +22,7 @@ class FirebaseServiceProvider extends ServiceProvider
         $this->app->singleton(Database::class, function ($app) {
             $factory = (new Factory)
                 ->withServiceAccount(config('firebase.credentials'))
-                ->withDatabaseUri(config('firebase.database_url'))
-                ->withServiceAccount(base_path('storage/app/firebase/smartcab-8bb42-firebase-adminsdk-fbsvc-de33a8e45b.json'))
-                ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
+                ->withDatabaseUri(config('firebase.database_url'));
 
             return $factory->createDatabase();
         });
