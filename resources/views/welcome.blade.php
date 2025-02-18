@@ -126,7 +126,7 @@
     <main class="pt-20 p-4 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto transition-colors duration-200">
             <!-- Info Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 order-2 md:order-1">
                 <!-- Temperature -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                     <div class="flex items-center">
@@ -189,23 +189,43 @@
                 </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="mt-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Doughnut Chart -->
-                    <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-300 mb-4">Temperature & Humidity Overview</h4>
-                        <div class="h-64">
-                            <canvas id="sensorChart"></canvas>
+            <!-- Charts and Door Status Section -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Door Lock Status Card - Changed order for mobile -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 order-1 md:order-2">
+                    <!-- Door Status -->
+                    <div class="flex items-center mb-6">
+                        <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Door Status</p>
+                            <p class="text-lg font-semibold text-green-600 dark:text-green-400" id="door-status">Locked</p>
                         </div>
                     </div>
 
-                    <!-- Line Chart -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200">
-                        <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-300 mb-4">Revenue Growth</h4>
-                        <div class="h-64">
-                            <canvas id="lineChart"></canvas>
+                    <div class="border-t dark:border-gray-700 pt-4">
+                        <!-- Last Access & Device Status -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Last Access</p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="last-access">Dikenali</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Device Status</p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="device-status">Online</p>
+                            </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Temperature & Humidity Chart -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200 order-2 md:order-1">
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-300 mb-4">Temperature & Humidity Overview</h4>
+                    <div class="h-64">
+                        <canvas id="sensorChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -425,6 +445,39 @@
             initializeCharts();
         });
 
+        // Function to update chart data
+        function updateChart(timestamp, temperature, humidity) {
+            const MAX_DATA_POINTS = 10;
+            
+            // Check if there's any change in the latest data
+            const lastTempData = sensorChart.data.datasets[0].data[sensorChart.data.datasets[0].data.length - 1];
+            const lastHumData = sensorChart.data.datasets[1].data[sensorChart.data.datasets[1].data.length - 1];
+            
+            // Only update if data is different or we don't have enough data points
+            if (lastTempData !== temperature || 
+                lastHumData !== humidity || 
+                sensorChart.data.labels.length < MAX_DATA_POINTS) {
+                
+                // Add new data
+                sensorChart.data.labels.push(new Date(timestamp).toLocaleTimeString());
+                sensorChart.data.datasets[0].data.push(temperature);
+                sensorChart.data.datasets[1].data.push(humidity);
+
+                // Remove old data if we have more than MAX_DATA_POINTS
+                if (sensorChart.data.labels.length > MAX_DATA_POINTS) {
+                    sensorChart.data.labels.shift();
+                    sensorChart.data.datasets[0].data.shift();
+                    sensorChart.data.datasets[1].data.shift();
+                }
+
+                // Update chart only if there's a change
+                sensorChart.update();
+                console.log('Chart updated with new data - Temp:', temperature, 'Humidity:', humidity);
+            } else {
+                console.log('No change in sensor data, skipping chart update');
+            }
+        }
+
         // Initialize the chart with empty data
         const ctx = document.getElementById('sensorChart').getContext('2d');
         const sensorChart = new Chart(ctx, {
@@ -439,7 +492,8 @@
                         data: [],
                         pointStyle: 'circle',
                         pointRadius: 6,
-                        pointHoverRadius: 8
+                        pointHoverRadius: 8,
+                        tension: 0.4  // Menambahkan smoothing pada garis
                     },
                     {
                         label: 'Humidity',
@@ -448,13 +502,18 @@
                         data: [],
                         pointStyle: 'circle',
                         pointRadius: 6,
-                        pointHoverRadius: 8
+                        pointHoverRadius: 8,
+                        tension: 0.4  // Menambahkan smoothing pada garis
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 750, // Durasi animasi dalam milidetik
+                    easing: 'easeInOutQuart' // Tipe animasi
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -483,25 +542,6 @@
                 }
             }
         });
-
-        // Function to update chart data
-        function updateChart(timestamp, temperature, humidity) {
-            const MAX_DATA_POINTS = 10;
-            
-            // Add new data
-            sensorChart.data.labels.push(new Date(timestamp).toLocaleTimeString());
-            sensorChart.data.datasets[0].data.push(temperature);
-            sensorChart.data.datasets[1].data.push(humidity);
-
-            // Remove old data if we have more than MAX_DATA_POINTS
-            if (sensorChart.data.labels.length > MAX_DATA_POINTS) {
-                sensorChart.data.labels.shift();
-                sensorChart.data.datasets[0].data.shift();
-                sensorChart.data.datasets[1].data.shift();
-            }
-
-            sensorChart.update();
-        }
 
         // Mobile Menu Toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -671,6 +711,61 @@
                 });
             }
         }
+
+        // Add these functions for door lock functionality
+        let isDoorLocked = true; // Initial state
+
+        function toggleDoorLock() {
+            isDoorLocked = !isDoorLocked;
+            updateDoorStatus();
+            
+            // Simulate last access update
+            const now = new Date();
+            document.getElementById('last-access').textContent = now.toLocaleTimeString();
+            
+            // Here you would typically update Firebase
+            // Uncomment when ready to connect to Firebase
+            /*
+            const doorRef = database.ref('door');
+            doorRef.update({
+                status: isDoorLocked ? 'locked' : 'unlocked',
+                lastAccess: now.toISOString(),
+                deviceStatus: 'online'
+            }).catch(error => {
+                console.error('Error updating door status:', error);
+                isDoorLocked = !isDoorLocked; // Revert state if update fails
+                updateDoorStatus();
+            });
+            */
+        }
+
+        function updateDoorStatus() {
+            const doorStatus = document.getElementById('door-status');
+            if (doorStatus) {
+                doorStatus.textContent = isDoorLocked ? 'Locked' : 'Unlocked';
+                doorStatus.className = isDoorLocked 
+                    ? 'text-lg font-semibold text-green-600 dark:text-green-400'
+                    : 'text-lg font-semibold text-red-600 dark:text-red-400';
+            }
+        }
+
+        // Add to your document ready function
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... existing initialization code ...
+            
+            // Initialize door status
+            updateDoorStatus();
+            
+            // Update device status periodically
+            setInterval(() => {
+                const deviceStatus = document.getElementById('device-status');
+                if (deviceStatus) {
+                    // Here you would typically check actual device connection
+                    deviceStatus.textContent = 'Online';
+                    deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
+                }
+            }, 5000);
+        });
     </script>
 </body>
 </html>
