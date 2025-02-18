@@ -301,20 +301,129 @@
         </div>
     </div>
 
-    <!-- Firebase App (the core Firebase SDK) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <!-- Firebase Database -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- Firebase SDK v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-        // Your web app's Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
+            apiKey: "AIzaSyCr8xNQIsPpIUMGIR9wEGmG7hgMDKf2H5I",
+            authDomain: "smartcab-8bb42.firebaseapp.com",
             databaseURL: "https://smartcab-8bb42-default-rtdb.firebaseio.com",
+            projectId: "smartcab-8bb42",
+            storageBucket: "smartcab-8bb42.firebasestorage.app",
+            messagingSenderId: "539751617121",
+            appId: "1:539751617121:web:3a899309fdb5e29efa9020",
+            measurementId: "G-BQPQLLCJTR"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+
+        let isUserAction = false;
+
+        // Function to update UI elements
+        function updateUIElement(elementId, value, suffix = '') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = `${value}${suffix}`;
+                console.log(`Updated ${elementId} with value: ${value}${suffix}`);
+            } else {
+                console.error(`Element ${elementId} not found`);
+            }
+        }
+
+        // Function to update UI with new data
+        function updateUI(data) {
+            console.log('Updating UI with data:', data);
+            
+            if (data.dht11) {
+                updateUIElement('temp-value', data.dht11.temperature, '°C');
+                updateUIElement('humidity-value', data.dht11.humidity, '%');
+                
+                // Update chart if it exists
+                if (typeof sensorChart !== 'undefined') {
+                    updateChart(Date.now(), data.dht11.temperature, data.dht11.humidity);
+                }
+            }
+            
+            if (data.security) {
+                updateUIElement('motion-value', data.security.motion);
+                updateUIElement('status-value', data.security.status);
+                
+                const toggle = document.getElementById('securityToggle');
+                if (toggle) {
+                    toggle.checked = data.security.status === 'on';
+                }
+            }
+        }
+
+        // Function to fetch and update data
+        function fetchAndUpdateData() {
+            fetch('https://smartcab-8bb42-default-rtdb.firebaseio.com/.json')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Data fetched successfully:', data);
+                    updateUI(data);
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+        }
+
+        // Function to toggle security status
+        function toggleSecurity(checkbox) {
+            isUserAction = true;
+            console.log('Toggle security called with state:', checkbox.checked);
+            
+            const securityRef = database.ref('security/status');
+            const newStatus = checkbox.checked ? 'on' : 'off';
+            
+            checkbox.disabled = true;
+            
+            securityRef.set(newStatus)
+                .then(() => {
+                    console.log('Security status updated successfully to:', newStatus);
+                    updateUIElement('status-value', newStatus);
+                })
+                .catch((error) => {
+                    console.error('Error updating security status:', error);
+                    checkbox.checked = !checkbox.checked;
+                    alert('Failed to update security status. Please try again.');
+                })
+                .finally(() => {
+                    checkbox.disabled = false;
+                    setTimeout(() => {
+                        isUserAction = false;
+                    }, 1000);
+                });
+        }
+
+        // Listen for security status changes
+        database.ref('security/status').on('value', (snapshot) => {
+            const status = snapshot.val();
+            if (status && !isUserAction) {
+                console.log('Security status updated:', status);
+                updateUIElement('status-value', status);
+                
+                const securityToggle = document.getElementById('securityToggle');
+                if (securityToggle && !securityToggle.disabled) {
+                    securityToggle.checked = status === 'on';
+                }
+            }
+        });
+
+        // Initialize when document is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Document ready, initializing...');
+            fetchAndUpdateData();
+            setInterval(fetchAndUpdateData, 1000);
+            
+            // Initialize charts
+            initializeCharts();
+        });
 
         // Initialize the chart with empty data
         const ctx = document.getElementById('sensorChart').getContext('2d');
@@ -393,13 +502,6 @@
 
             sensorChart.update();
         }
-
-        // Listen for real-time updates
-        database.ref('dht11').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const timestamp = Date.now();
-            updateChart(timestamp, data.temperature, data.humidity);
-        });
 
         // Mobile Menu Toggle
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -556,29 +658,6 @@
             });
         }
 
-        initializeCharts();
-
-        // Real-time listeners for sensor data
-        const dbRef = firebase.database();
-        
-        // DHT11 Sensor listener
-        dbRef.ref('dht11').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                document.getElementById('temp-value').textContent = `${data.temperature}°C`;
-                document.getElementById('humidity-value').textContent = `${data.humidity}%`;
-            }
-        });
-
-        // Security listener
-        dbRef.ref('security').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                document.getElementById('motion-value').textContent = data.motion;
-                document.getElementById('status-value').textContent = data.status;
-            }
-        });
-
         // Add these functions to your existing script
         function toggleModal() {
             const modal = document.getElementById('controlModal');
@@ -586,26 +665,12 @@
             
             // Update toggle state when modal opens
             if (!modal.classList.contains('hidden')) {
-                dbRef.ref('security/status').once('value', (snapshot) => {
+                database.ref('security/status').once('value', (snapshot) => {
                     const status = snapshot.val();
                     document.getElementById('securityToggle').checked = status === 'on';
                 });
             }
         }
-
-        function toggleSecurity(checkbox) {
-            const newStatus = checkbox.checked ? 'on' : 'off';
-            dbRef.ref('security').update({
-                status: newStatus
-            });
-        }
-
-        // Listen for security status changes
-        dbRef.ref('security/status').on('value', (snapshot) => {
-            const status = snapshot.val();
-            document.getElementById('securityToggle').checked = status === 'on';
-            document.getElementById('status-value').textContent = status;
-        });
     </script>
 </body>
 </html>
