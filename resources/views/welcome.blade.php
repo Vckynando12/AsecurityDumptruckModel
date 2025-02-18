@@ -83,7 +83,7 @@
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Hi!Vicky</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">vickynando12@gmail.com</p>
                             </div>
-                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600">Your Profile</a>
+                            <a href="{{route('profile')}}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600">Your Profile</a>
                             <a href="{{route('logout')}}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600">Logout</a>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                         </div>
                     </div>
                     <div class="mt-4 space-y-2">
-                        <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Your Profile</a>
+                        <a href="{{route('profile')}}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Your Profile</a>
                         <a href="{{route('logout')}}" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Logout</a>
                     </div>
                 </div>
