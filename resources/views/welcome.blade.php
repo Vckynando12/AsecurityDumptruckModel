@@ -778,9 +778,9 @@
                 if (servoStatus) {
                     servoStatus.textContent = data.smartcab.servo_status;
                     // Update color based on status
-                    if (data.smartcab.servo_status === 'Locked') {
+                    if (data.smartcab.servo_status === 'terkunci') {
                         servoStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
-                    } else {
+                    } else if (data.smartcab.servo_status === 'terbuka') {
                         servoStatus.className = 'text-lg font-semibold text-red-600 dark:text-red-400';
                     }
                 }
