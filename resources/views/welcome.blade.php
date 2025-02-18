@@ -191,8 +191,8 @@
 
             <!-- Charts and Door Status Section -->
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Door Lock Status Card - Changed order for mobile -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 order-1 md:order-2">
+                <!-- Door Lock Status Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
                     <!-- Door Status -->
                     <div class="flex items-center mb-6">
                         <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
@@ -202,7 +202,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Door Status</p>
-                            <p class="text-lg font-semibold text-green-600 dark:text-green-400" id="door-status">Locked</p>
+                            <p class="text-lg font-semibold text-green-600 dark:text-green-400" id="servo-status">{{ $servo_status }}</p>
                         </div>
                     </div>
 
@@ -211,11 +211,11 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Last Access</p>
-                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="last-access">Dikenali</p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="last-access">{{ $last_access }}</p>
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Device Status</p>
-                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="device-status">Online</p>
+                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="device-status">{{ $status_device }}</p>
                             </div>
                         </div>
                     </div>
@@ -378,6 +378,9 @@
                     toggle.checked = data.security.status === 'on';
                 }
             }
+
+            // Add door status updates
+            updateDoorStatus(data);
         }
 
         // Function to fetch and update data
@@ -447,7 +450,7 @@
 
         // Function to update chart data
         function updateChart(timestamp, temperature, humidity) {
-            const MAX_DATA_POINTS = 10;
+            const MAX_DATA_POINTS = 5;
             
             // Check if there's any change in the latest data
             const lastTempData = sensorChart.data.datasets[0].data[sensorChart.data.datasets[0].data.length - 1];
@@ -740,7 +743,7 @@
         }
 
         function updateDoorStatus() {
-            const doorStatus = document.getElementById('door-status');
+            const doorStatus = document.getElementById('servo-status');
             if (doorStatus) {
                 doorStatus.textContent = isDoorLocked ? 'Locked' : 'Unlocked';
                 doorStatus.className = isDoorLocked 
@@ -765,6 +768,49 @@
                     deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
                 }
             }, 5000);
+        });
+
+        // Function to update door status UI
+        function updateDoorStatus(data) {
+            if (data.smartcab) {
+                // Update servo status
+                const servoStatus = document.getElementById('servo-status');
+                if (servoStatus) {
+                    servoStatus.textContent = data.smartcab.servo_status;
+                    // Update color based on status
+                    if (data.smartcab.servo_status === 'Locked') {
+                        servoStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
+                    } else {
+                        servoStatus.className = 'text-lg font-semibold text-red-600 dark:text-red-400';
+                    }
+                }
+
+                // Update last access
+                const lastAccess = document.getElementById('last-access');
+                if (lastAccess) {
+                    lastAccess.textContent = data.smartcab.last_access;
+                }
+
+                // Update device status
+                const deviceStatus = document.getElementById('device-status');
+                if (deviceStatus) {
+                    deviceStatus.textContent = data.smartcab.status_device;
+                    // Update color based on status
+                    if (data.smartcab.status_device === 'Online') {
+                        deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
+                    } else {
+                        deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
+                    }
+                }
+            }
+        }
+
+        // Listen for smartcab changes
+        database.ref('smartcab').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                updateDoorStatus(data);
+            }
         });
     </script>
 </body>
