@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\FirebaseAuthController;
 use App\Http\Controllers\AIChatController;
-use App\Http\Controllers\FirebaseController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/login', [FirebaseAuthController::class, 'showLogin'])
     ->name('login')
@@ -35,4 +35,4 @@ Route::get('/', function () {
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-Route::get('/save-firebase', [FirebaseController::class, 'saveFirebaseData']);
+Route::get('/reports', [ReportController::class, 'index']);
