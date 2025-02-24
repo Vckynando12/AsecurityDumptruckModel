@@ -402,7 +402,7 @@
             console.log('Toggle security called with state:', checkbox.checked);
             
             const securityRef = database.ref('security/status');
-            const newStatus = checkbox.checked ? 'on' : 'off';
+            const newStatus = checkbox.checked ? 'ON' : 'OFF';
             
             checkbox.disabled = true;
             

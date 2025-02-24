@@ -6,6 +6,12 @@
     <title>Report Data</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* CSS untuk memastikan tabel responsif */
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
 
@@ -31,60 +37,67 @@
     @endphp
 
     @if($paginatedReports->count() > 0)
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tanggal</th>
-                    <th>Perangkat</th>
-                    <th>Status</th>
-                    <th>Info Selengkapnya</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($paginatedReports as $key => $report)
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <td>{{ $paginatedReports->firstItem() + $key }}</td>
-                        <td>{{ \Carbon\Carbon::parse($report['timestamp'])->format('d-m-Y H:i:s') }}</td>
-                        <td>
-                            @if($loop->first)
-                                Gerakan
-                            @elseif($report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
-                                Gerakan
-                            @elseif($report['security']['status'] !== $reports[$key - 1]['security']['status'])
-                                Status Keamanan
-                            @elseif($report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
-                                Akses Terakhir
-                            @elseif($report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
-                                Status Servo
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td>
-                            @if($loop->first)
-                                {{ ucfirst($report['security']['motion']) }}
-                            @elseif($report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
-                                {{ ucfirst($report['security']['motion']) }}
-                            @elseif($report['security']['status'] !== $reports[$key - 1]['security']['status'])
-                                {{ ucfirst($report['security']['status']) }}
-                            @elseif($report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
-                                {{ ucfirst($report['smartcab']['last_access']) }}
-                            @elseif($report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
-                                {{ ucfirst($report['smartcab']['servo_status']) }}
-                            @else
-                                Tidak ada perubahan
-                            @endif
-                        </td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="showDetail({{ json_encode($report) }})">
-                                Lihat Detail
-                            </button>
-                        </td>
+                        <th>#</th>
+                        <th>Tanggal</th>
+                        <th>Perangkat</th>
+                        <th>Status</th>
+                        <th>Info Selengkapnya</th>
                     </tr>
-                @endforeach
-            </tbody>                     
-        </table>
+                </thead>
+                <tbody>
+                    @foreach($paginatedReports as $key => $report)
+                        <tr>
+                            <td>{{ $paginatedReports->firstItem() + $key }}</td>
+                            <td>
+                                <!-- Format tanggal sesuai dengan pop-up -->
+                                <script>
+                                    document.write(new Date("{{ $report['timestamp'] }}").toLocaleString());
+                                </script>
+                            </td>
+                            <td>
+                                @if($loop->first)
+                                    Gerakan
+                                @elseif($report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
+                                    Gerakan
+                                @elseif($report['security']['status'] !== $reports[$key - 1]['security']['status'])
+                                    Status Keamanan
+                                @elseif($report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
+                                    Akses Terakhir
+                                @elseif($report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
+                                    Status Servo
+                                @else
+                                    -
+                                @endif
+                            </td>
+                            <td>
+                                @if($loop->first)
+                                    {{ ucfirst($report['security']['motion']) }}
+                                @elseif($report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
+                                    {{ ucfirst($report['security']['motion']) }}
+                                @elseif($report['security']['status'] !== $reports[$key - 1]['security']['status'])
+                                    {{ ucfirst($report['security']['status']) }}
+                                @elseif($report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
+                                    {{ ucfirst($report['smartcab']['last_access']) }}
+                                @elseif($report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
+                                    {{ ucfirst($report['smartcab']['servo_status']) }}
+                                @else
+                                    Tidak ada perubahan
+                                @endif
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="showDetail({{ json_encode($report) }})">
+                                    Lihat Detail
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>                     
+            </table>
+        </div>
 
         <!-- PAGINATION -->
         <div class="d-flex justify-content-center">
@@ -115,8 +128,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function showDetail(report) {
+        // Format tanggal sesuai dengan locale browser
+        let formattedDate = new Date(report.timestamp).toLocaleString();
+
         let detailHtml = `
-            <strong>Tanggal:</strong> ${new Date(report.timestamp).toLocaleString()}<br>
+            <strong>Tanggal waktu:</strong> ${formattedDate}<br>
             <strong>Gerakan:</strong> ${report.security.motion}<br>
             <strong>Status Keamanan:</strong> ${report.security.status}<br>
             <strong>Akses Terakhir:</strong> ${report.smartcab.last_access}<br>
