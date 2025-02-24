@@ -98,3 +98,5 @@ void loop() {
 
     delay(2000);  // Update setiap 2 detik
 }
+
+
