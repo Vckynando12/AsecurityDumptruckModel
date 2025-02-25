@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* CSS untuk memastikan tabel responsif */
         .table-responsive {
             overflow-x: auto;
         }
@@ -21,12 +20,9 @@
     @php
         use Illuminate\Pagination\LengthAwarePaginator;
         
-        // Konversi array ke koleksi
-        $reportsCollection = collect($reports);
-
-        // Pagination manual
+        $reportsCollection = collect($reports)->sortByDesc('timestamp');
         $currentPage = request()->get('page', 1);
-        $perPage = 10; // Jumlah item per halaman
+        $perPage = 1000;
         $paginatedReports = new LengthAwarePaginator(
             $reportsCollection->forPage($currentPage, $perPage), 
             $reportsCollection->count(), 
@@ -52,22 +48,17 @@
                     @foreach($paginatedReports as $key => $report)
                         <tr>
                             <td>{{ $paginatedReports->firstItem() + $key }}</td>
-                            <td>
-                                <!-- Format tanggal sesuai dengan pop-up -->
-                                <script>
-                                    document.write(new Date("{{ $report['timestamp'] }}").toLocaleString());
-                                </script>
-                            </td>
+                            <td>{{ date('d-m-Y H:i:s', strtotime($report['timestamp'])) }}</td>
                             <td>
                                 @if($loop->first)
                                     Gerakan
-                                @elseif($report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
+                                @elseif($key > 0 && $report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
                                     Gerakan
-                                @elseif($report['security']['status'] !== $reports[$key - 1]['security']['status'])
+                                @elseif($key > 0 && $report['security']['status'] !== $reports[$key - 1]['security']['status'])
                                     Status Keamanan
-                                @elseif($report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
+                                @elseif($key > 0 && $report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
                                     Akses Terakhir
-                                @elseif($report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
+                                @elseif($key > 0 && $report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
                                     Status Servo
                                 @else
                                     -
@@ -76,30 +67,29 @@
                             <td>
                                 @if($loop->first)
                                     {{ ucfirst($report['security']['motion']) }}
-                                @elseif($report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
+                                @elseif($key > 0 && $report['security']['motion'] !== $reports[$key - 1]['security']['motion'])
                                     {{ ucfirst($report['security']['motion']) }}
-                                @elseif($report['security']['status'] !== $reports[$key - 1]['security']['status'])
+                                @elseif($key > 0 && $report['security']['status'] !== $reports[$key - 1]['security']['status'])
                                     {{ ucfirst($report['security']['status']) }}
-                                @elseif($report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
+                                @elseif($key > 0 && $report['smartcab']['last_access'] !== $reports[$key - 1]['smartcab']['last_access'])
                                     {{ ucfirst($report['smartcab']['last_access']) }}
-                                @elseif($report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
+                                @elseif($key > 0 && $report['smartcab']['servo_status'] !== $reports[$key - 1]['smartcab']['servo_status'])
                                     {{ ucfirst($report['smartcab']['servo_status']) }}
                                 @else
                                     Tidak ada perubahan
                                 @endif
                             </td>
                             <td>
-                                <button class="btn btn-primary btn-sm" onclick="showDetail({{ json_encode($report) }})">
+                                <button class="btn btn-primary btn-sm" onclick='showDetail(@json($report))'>
                                     Lihat Detail
                                 </button>
                             </td>
                         </tr>
                     @endforeach
-                </tbody>                     
+                </tbody>
             </table>
         </div>
 
-        <!-- PAGINATION -->
         <div class="d-flex justify-content-center">
             {{ $paginatedReports->links('pagination::bootstrap-4') }}
         </div>
@@ -119,7 +109,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="modalBodyContent">
-                <!-- Data akan dimasukkan melalui JavaScript -->
             </div>
         </div>
     </div>
@@ -128,9 +117,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function showDetail(report) {
-        // Format tanggal sesuai dengan locale browser
         let formattedDate = new Date(report.timestamp).toLocaleString();
-
         let detailHtml = `
             <strong>Tanggal waktu:</strong> ${formattedDate}<br>
             <strong>Gerakan:</strong> ${report.security.motion}<br>
@@ -141,7 +128,6 @@
             <strong>Kelembaban:</strong> ${report.dht11.humidity}%<br>
             <strong>Suhu:</strong> ${report.dht11.temperature}°C
         `;
-
         document.getElementById('modalBodyContent').innerHTML = detailHtml;
         let detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
         detailModal.show();
