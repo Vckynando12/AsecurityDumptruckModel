@@ -48,7 +48,7 @@
                     @foreach($paginatedReports as $key => $report)
                         <tr>
                             <td>{{ $paginatedReports->firstItem() + $key }}</td>
-                            <td>{{ date('d-m-Y H:i:s', strtotime($report['timestamp'])) }}</td>
+                            <td>{{ date('d/m/Y H:i', strtotime($report['timestamp'])) }}</td>
                             <td>
                                 @if($loop->first)
                                     Gerakan
