@@ -5,8 +5,8 @@
 #include <DHT.h>
 
 // Konfigurasi WiFi
-#define WIFI_SSID "KONTRAKAN OYI"
-#define WIFI_PASSWORD "warkopoyi"
+#define WIFI_SSID "smartcab"
+#define WIFI_PASSWORD "123123123"
 
 // Konfigurasi Firebase
 #define FIREBASE_HOST "smartcab-8bb42-default-rtdb.firebaseio.com"
@@ -64,7 +64,7 @@ void setup() {
     Firebase.begin(&firebaseConfig, &firebaseAuth);
     Firebase.reconnectWiFi(true);
 
-    // Tambahkan status device online setelah koneksi berhasil
+    // Update status device saat startup
     Firebase.setString(firebaseData, "/logs/systemESP", "Device online");
 
     // Inisialisasi sensor
@@ -105,16 +105,25 @@ void setup() {
 }
 
 void loop() {
-    // Tambahkan heartbeat check di awal loop
+    // Update lastActive dengan unix timestamp
     if (millis() - lastHeartbeatTime >= heartbeatInterval) {
         lastHeartbeatTime = millis();
-        // Kirim timestamp dalam format epoch (unix timestamp)
         unsigned long epochTime = time(nullptr);
         if (Firebase.setInt(firebaseData, "/device/lastActive", epochTime)) {
             Serial.println("Heartbeat sent: " + String(epochTime));
+            // Tambahkan update status Device online saat heartbeat berhasil
+            Firebase.setString(firebaseData, "/logs/systemESP", "Device online");
+            Serial.println("Device status updated: Online");
         } else {
             Serial.println("Failed to send heartbeat");
+            // Jika gagal mengirim heartbeat, set status offline
+            Firebase.setString(firebaseData, "/logs/systemESP", "Device offline");
         }
+    }
+
+    // Cek jika tidak ada perubahan dalam 70 detik
+    if (millis() - lastHeartbeatTime > 70000) {
+        Firebase.setString(firebaseData, "/logs/systemESP", "Device offline");
     }
 
     // Tambahkan pengecekan status restart di awal loop

@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,6 +6,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="{{ asset('js/notification-constants.js') }}"></script>
+    <script src="{{ asset('js/notifications.js') }}"></script>
+    <link href="{{ asset('css/notifications.css') }}" rel="stylesheet">
 </head>
 <body class="bg-gray-100 dark:bg-gray-900" x-data="{ isNotificationsPanelOpen: false }">
     <!-- Navbar -->
@@ -126,173 +128,381 @@
     <main class="pt-20 p-4 dark:bg-gray-900">
         <div class="max-w-7xl mx-auto transition-colors duration-200">
             <!-- Info Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 order-2 md:order-1">
-                <!-- Temperature -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Temperature Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                     <div class="flex items-center">
-                        <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full dark:text-red-100 dark:bg-red-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-2 sm:p-3 mr-3 sm:mr-4 bg-red-100 rounded-full">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Temperature</p>
-                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="temp-value">{{ $temperature }}°C</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Temperature</p>
+                            <p class="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-200" id="temp-value">{{ $temperature }}°C</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Humidity -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <!-- Wemos D1 Mini Status -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                     <div class="flex items-center">
-                        <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-blue-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                            </svg>
+                        <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-amber-100 rounded-full">
+                            <img src="{{ asset('asset/wemos.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="">
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Humidity</p>
-                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="humidity-value">{{ $humidity }}%</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Wemos D1 Mini</p>
+                            <p class="text-sm sm:text-lg font-semibold" id="wemos-status">
+                                {{ $systemWemos == 'Device Online' ? 'Online' : 'Offline' }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Motion -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <!-- NodeMCU ESP8266 Status -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                     <div class="flex items-center">
-                        <div class="p-3 mr-4 text-yellow-500 bg-yellow-100 rounded-full dark:text-yellow-100 dark:bg-yellow-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
+                        <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-amber-100 rounded-full">
+                            <img src="{{ asset('asset/esp.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="">
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Motion</p>
-                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="motion-value">{{ $motion }}</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">NodeMCU ESP8266</p>
+                            <p class="text-sm sm:text-lg font-semibold" id="esp-status">
+                                {{ $systemESP == 'Device online' ? 'Online' : 'Offline' }}
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Security Status -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                     <div class="flex items-center">
-                        <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-green-100 rounded-full">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 00-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Security Status</p>
-                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="status-value">{{ $status }}</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Security Status</p>
+                            <p class="text-sm sm:text-lg font-semibold" id="security-status">
+                                {{ $status }}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Charts and Door Status Section -->
-            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Door Lock Status Card -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                    <!-- Door Status -->
+            <!-- Mobile-specific order for remaining sections -->
+            <div class="md:hidden mt-4">
+                <!-- Door Status Section for Mobile -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-4">
                     <div class="flex items-center mb-6">
-                        <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-green-100 rounded-full">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Door Status</p>
-                            <p class="text-lg font-semibold text-green-600 dark:text-green-400" id="servo-status">{{ $servo_status }}</p>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Door Status</p>
+                            <p class="text-sm sm:text-lg font-semibold" id="door-status">
+                                {{ $servo_status }}
+                            </p>
                         </div>
                     </div>
 
-                    <div class="border-t dark:border-gray-700 pt-4">
-                        <!-- Last Access & Device Status -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Last Access</p>
-                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="last-access">{{ $last_access }}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Akses Terakhir</p>
+                            <p class="text-sm sm:text-lg font-semibold text-green-500" id="last-access">{{ $last_access }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Card ID terdeteksi</p>
+                            <p class="text-sm sm:text-lg font-semibold text-green-500" id="status-device">{{ $status_device }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Indicators for Mobile - Dipindahkan setelah door status -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <!-- Exhaust Fan Status -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4">
+                        <div class="flex items-center">
+                            <div class="p-2 sm:p-3 mr-3 sm:mr-4 bg-green-100 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.071 4.929a10 10 0 10-14.142 14.142 10 10 0 0014.142-14.142z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8M8 12h8"/>
+                                </svg>
                             </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Device Status</p>
-                                <p class="text-lg font-semibold text-gray-700 dark:text-gray-200" id="device-status">{{ $status_device }}</p>
+                            <div class="flex-1">
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Exhaust fan</p>
+                                <p class="text-sm sm:text-lg font-semibold" id="fan-status">
+                                    {{ $fan == 'ON' ? 'Aktif' : 'Mati' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alarm System Status -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4">
+                        <div class="flex items-center">
+                            <div class="p-2 sm:p-3 mr-3 sm:mr-4 bg-red-100 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Alarm System</p>
+                                <p class="text-sm sm:text-lg font-semibold" id="motion-status">
+                                    {{ $motion == 'clear' ? 'Aman' : 'Terdeteksi' }}
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Temperature & Humidity Chart -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200 order-2 md:order-1">
-                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-300 mb-4">Temperature & Humidity Overview</h4>
-                    <div class="h-64">
-                        <canvas id="sensorChart"></canvas>
+                <!-- Device and Sensor Information for Mobile -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-4">
+                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                        <span class="inline-block mr-2">
+                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                            </svg>
+                        </span>
+                        Informasi perangkat dan sensor
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- DHT 11 -->
+                        <div class="flex items-center">
+                            <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                <img src="{{ asset('asset/dht.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="DHT11">
+                            </div>
+                            <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">DHT 11</p>
+                                <p class="text-sm sm:text-lg font-semibold {{ $dhtStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $dhtStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- MPU 6050 -->
+                        <div class="flex items-center">
+                            <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                <img src="{{ asset('asset/mpu.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="MPU6050">
+                            </div>
+                            <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">MPU 6050</p>
+                                <p class="text-sm sm:text-lg font-semibold {{ $mpuStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $mpuStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Servo MG996r -->
+                        <div class="flex items-center">
+                            <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                <img src="{{ asset('asset/servo.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="Servo">
+                            </div>
+                            <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Servo MG996r</p>
+                                <p class="text-sm sm:text-lg font-semibold {{ $servoStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $servoStatus }}</p>
+                            </div>
+                        </div>
+
+                        <!-- RFID Reader -->
+                        <div class="flex items-center">
+                            <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                <img src="{{ asset('asset/rfid.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="RFID">
+                            </div>
+                            <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">RFID Reader</p>
+                                <p class="text-sm sm:text-lg font-semibold {{ $rfidStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $rfidStatus }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop layout (hidden on mobile) -->
+            <div class="hidden md:block">
+                <!-- Device Information Section -->
+                <div class="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Device and Sensor Information -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                            <span class="inline-block mr-2">
+                                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                </svg>
+                            </span>
+                            Informasi perangkat dan sensor
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- DHT 11 -->
+                            <div class="flex items-center">
+                                <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                    <img src="{{ asset('asset/dht.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="DHT11">
+                                </div>
+                                <div>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">DHT 11</p>
+                                    <p class="text-sm sm:text-lg font-semibold {{ $dhtStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $dhtStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                                </div>
+                            </div>
+
+                            <!-- MPU 6050 -->
+                            <div class="flex items-center">
+                                <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                    <img src="{{ asset('asset/mpu.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="MPU6050">
+                                </div>
+                                <div>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">MPU 6050</p>
+                                    <p class="text-sm sm:text-lg font-semibold {{ $mpuStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $mpuStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Servo MG996r -->
+                            <div class="flex items-center">
+                                <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                    <img src="{{ asset('asset/servo.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="Servo">
+                                </div>
+                                <div>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Servo MG996r</p>
+                                    <p class="text-sm sm:text-lg font-semibold {{ $servoStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $servoStatus }}</p>
+                                </div>
+                            </div>
+
+                            <!-- RFID Reader -->
+                            <div class="flex items-center">
+                                <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
+                                    <img src="{{ asset('asset/rfid.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="RFID">
+                                </div>
+                                <div>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">RFID Reader</p>
+                                    <p class="text-sm sm:text-lg font-semibold {{ $rfidStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $rfidStatus }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Door Status Section -->
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                        <div class="flex items-center mb-6">
+                            <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-green-100 rounded-full">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Door Status</p>
+                                <p class="text-sm sm:text-lg font-semibold" id="door-status">
+                                    {{ $servo_status }}
+                                </p>
+                            </div>
+                        </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Akses Terakhir</p>
+                                <p class="text-sm sm:text-lg font-semibold text-green-500" id="last-access">{{ $last_access }}</p>
+                                </div>
+                                <div>
+                                <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Card ID terdeteksi</p>
+                                <p class="text-sm sm:text-lg font-semibold text-green-500" id="status-device">{{ $status_device }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Bottom Section -->
+            <div class="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Information Box -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                    <div class="flex items-center">
+                        <div class="p-2 bg-yellow-100 rounded-full mr-4">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                    </div>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Keterangan</h3>
+                    </div>
+                    <div class="mt-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <p><b>⚠︎ Data perangkat Wemos D1 Mini dan NodeMCU ESP8266 memiliki jeda 1 menit. Saat pengecekan, tunggu 1 menit untuk melihat perubahan data.</b></p>
+                        <p>•Jika anda restart wemos d1 mini maka perangkat RFID dan servo akan ikut dimulai ulang / di restart</p>
+                        <p>•Jika anda restart NodeMCU Esp8266 maka perangkat kipas,alarm,DHT 11,dan Mpu6050 akan ikut di mulai ulang</p>
+                    </div>
+                </div>
+
+                <!-- Device Control and Status Section -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Device Control Section -->
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center">
+                                    <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-blue-100 rounded-full">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Mulai Ulang Perangkat</h3>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Wemos D1 mini -->
+                                <button id="restartWemos" class="flex flex-col items-center justify-center p-3 sm:p-4 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl dark:shadow-gray-900">
+                                    <img src="{{ asset('asset/wemos.png') }}" class="w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3" alt="Wemos D1 mini">
+                                    <p class="text-sm sm:text-base text-gray-700 dark:text-gray-200 text-center">Wemos D1 mini</p>
+                                </button>
+                                
+                                <!-- NodeMCU ESP8266 -->
+                                <button id="restartESP" class="flex flex-col items-center justify-center p-3 sm:p-4 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-xl dark:shadow-gray-900">
+                                    <img src="{{ asset('asset/esp.png') }}" class="w-12 h-12 sm:w-16 sm:h-16 mb-2 sm:mb-3" alt="NodeMCU ESP8266">
+                                    <p class="text-sm sm:text-base text-gray-700 dark:text-gray-200 text-center">NodeMCU ESP8266</p>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status Indicators - Hanya tampil di desktop -->
+                        <div class="grid grid-rows-2 gap-4 hidden md:grid">
+                            <!-- Exhaust Fan Status -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4">
+                                <div class="flex items-center">
+                                    <div class="p-2 sm:p-3 mr-3 sm:mr-4 bg-green-100 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c-1.657 0-3-1.343-3-3s1.343-3 3-3 3 1.343 3 3-1.343 3-3 3z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.071 4.929a10 10 0 10-14.142 14.142 10 10 0 0014.142-14.142z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8M8 12h8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Exhaust fan</p>
+                                        <p class="text-sm sm:text-lg font-semibold text-green-500" id="fan-status">Aktif</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alarm System Status -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 sm:p-4">
+                                <div class="flex items-center">
+                                    <div class="p-2 sm:p-3 mr-3 sm:mr-4 bg-red-100 rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Alarm System</p>
+                                        <p class="text-sm sm:text-lg font-semibold text-gray-500" id="motion-status">Dinonaktifkan</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Notification Panel -->
-    <div 
-        x-show="isNotificationsPanelOpen" 
-        x-transition:enter="transform transition ease-in-out duration-300"
-        x-transition:enter-start="-translate-x-full"
-        x-transition:enter-end="translate-x-0"
-        x-transition:leave="transform transition ease-in-out duration-300"
-        x-transition:leave-start="translate-x-0"
-        x-transition:leave-end="-translate-x-full"
-        class="fixed inset-0 z-50"
-    >
-        <!-- Backdrop -->
-        <div 
-            class="fixed inset-0 bg-black bg-opacity-50" 
-            @click="isNotificationsPanelOpen = false"
-        ></div>
-        
-        <!-- Panel -->
-        <div 
-            x-transition:enter="transform transition ease-in-out duration-300"
-            x-transition:enter-start="-translate-x-full"
-            x-transition:enter-end="translate-x-0"
-            x-transition:leave="transform transition ease-in-out duration-300"
-            x-transition:leave-start="translate-x-0"
-            x-transition:leave-end="-translate-x-full"
-            class="fixed inset-y-0 left-0 w-full max-w-xs bg-white dark:bg-gray-800 overflow-y-auto"
-        >
-            <div class="flex flex-col h-screen">
-                <!-- Header -->
-                <div class="flex items-center justify-between p-4 border-b dark:border-primary-darker">
-                    <h2 class="text-xl font-semibold text-gray-700 dark:text-light">Notifications</h2>
-                    <button @click="isNotificationsPanelOpen = false" class="p-2 text-gray-600 rounded-md hover:bg-gray-100 dark:text-light dark:hover:bg-primary">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Notification Items -->
-                <div class="flex-1 p-4 space-y-4">
-                    <!-- Sample Notification Item -->
-                    <div class="flex p-4 bg-white dark:bg-darker rounded-lg shadow">
-                        <div class="flex-shrink-0">
-                            <span class="p-2 bg-blue-500 rounded-full text-white">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                                </svg>
-                            </span>
-                        </div>
-                        <div class="ml-4">
-                            <h4 class="text-sm font-semibold text-gray-700 dark:text-light">New Order Received</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Order #123 has been placed</p>
-                            <span class="text-xs text-gray-400 dark:text-gray-500">2 minutes ago</span>
-                        </div>
-                    </div>
-                    
-                    <!-- ... more notification items -->
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Include notification panel component -->
+    @include('components.notification-panel')
 
     <!-- Floating Action Button -->
     <div class="fixed bottom-0 right-0 z-50 mb-5 mr-5">
@@ -338,480 +548,741 @@
             measurementId: "G-BQPQLLCJTR"
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        // Inisialisasi Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
         const database = firebase.database();
 
-        let isUserAction = false;
+        // Tambahkan variabel untuk melacak status restart ESP
+        let espRestartRequested = false;
 
-        // Function to update UI elements
-        function updateUIElement(elementId, value, suffix = '') {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = `${value}${suffix}`;
-                console.log(`Updated ${elementId} with value: ${value}${suffix}`);
-            } else {
-                console.error(`Element ${elementId} not found`);
-            }
-        }
-
-        // Function to update UI with new data
-        function updateUI(data) {
-            console.log('Updating UI with data:', data);
-            
-            if (data.dht11) {
-                updateUIElement('temp-value', data.dht11.temperature, '°C');
-                updateUIElement('humidity-value', data.dht11.humidity, '%');
-                
-                // Update chart if it exists
-                if (typeof sensorChart !== 'undefined') {
-                    updateChart(Date.now(), data.dht11.temperature, data.dht11.humidity);
-                }
-            }
-            
-            if (data.security) {
-                updateUIElement('motion-value', data.security.motion);
-                updateUIElement('status-value', data.security.status);
-                
-                const toggle = document.getElementById('securityToggle');
-                if (toggle) {
-                    toggle.checked = data.security.status === 'on';
-                }
-            }
-
-            // Add door status updates
-            updateDoorStatus(data);
-        }
-
-        // Function to fetch and update data
-        function fetchAndUpdateData() {
-            fetch('https://smartcab-8bb42-default-rtdb.firebaseio.com/.json')
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Data fetched successfully:', data);
-                    updateUI(data);
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                });
-        }
-
-        // Function to toggle security status
-        function toggleSecurity(checkbox) {
-            isUserAction = true;
-            console.log('Toggle security called with state:', checkbox.checked);
-            
-            const securityRef = database.ref('security/status');
-            const newStatus = checkbox.checked ? 'ON' : 'OFF';
-            
-            checkbox.disabled = true;
-            
-            securityRef.set(newStatus)
-                .then(() => {
-                    console.log('Security status updated successfully to:', newStatus);
-                    updateUIElement('status-value', newStatus);
-                })
-                .catch((error) => {
-                    console.error('Error updating security status:', error);
-                    checkbox.checked = !checkbox.checked;
-                    alert('Failed to update security status. Please try again.');
-                })
-                .finally(() => {
-                    checkbox.disabled = false;
-                    setTimeout(() => {
-                        isUserAction = false;
-                    }, 1000);
-                });
-        }
-
-        // Listen for security status changes
-        database.ref('security/status').on('value', (snapshot) => {
+        // Listener untuk ESP status
+        database.ref('logs/systemESP').on('value', (snapshot) => {
             const status = snapshot.val();
-            if (status && !isUserAction) {
-                console.log('Security status updated:', status);
-                updateUIElement('status-value', status);
-                
-                const securityToggle = document.getElementById('securityToggle');
-                if (securityToggle && !securityToggle.disabled) {
-                    securityToggle.checked = status === 'on';
-                }
-            }
-        });
-
-        // Initialize when document is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Document ready, initializing...');
-            fetchAndUpdateData();
-            setInterval(fetchAndUpdateData, 1000);
+            console.log('ESP status received:', status);
             
-            // Initialize charts
-            initializeCharts();
-        });
-
-        // Function to update chart data
-        function updateChart(timestamp, temperature, humidity) {
-            const MAX_DATA_POINTS = 5;
+            let statusText;
+            let statusClass;
             
-            // Check if there's any change in the latest data
-            const lastTempData = sensorChart.data.datasets[0].data[sensorChart.data.datasets[0].data.length - 1];
-            const lastHumData = sensorChart.data.datasets[1].data[sensorChart.data.datasets[1].data.length - 1];
-            
-            // Only update if data is different or we don't have enough data points
-            if (lastTempData !== temperature || 
-                lastHumData !== humidity || 
-                sensorChart.data.labels.length < MAX_DATA_POINTS) {
-                
-                // Add new data
-                sensorChart.data.labels.push(new Date(timestamp).toLocaleTimeString());
-                sensorChart.data.datasets[0].data.push(temperature);
-                sensorChart.data.datasets[1].data.push(humidity);
-
-                // Remove old data if we have more than MAX_DATA_POINTS
-                if (sensorChart.data.labels.length > MAX_DATA_POINTS) {
-                    sensorChart.data.labels.shift();
-                    sensorChart.data.datasets[0].data.shift();
-                    sensorChart.data.datasets[1].data.shift();
-                }
-
-                // Update chart only if there's a change
-                sensorChart.update();
-                console.log('Chart updated with new data - Temp:', temperature, 'Humidity:', humidity);
+            if (status === 'Device online') {
+                statusText = 'Online';
+                statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+            } else if (status === 'Device auto-restarting...' || status === 'Device restarting by command...') {
+                statusText = 'Restarting...';
+                statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
             } else {
-                console.log('No change in sensor data, skipping chart update');
+                statusText = 'Offline';
+                statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
             }
-        }
-
-        // Initialize the chart with empty data
-        const ctx = document.getElementById('sensorChart').getContext('2d');
-        const sensorChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [
-                    {
-                        label: 'Temperature',
-                        borderColor: 'rgb(255, 99, 132)',
-                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                        data: [],
-                        pointStyle: 'circle',
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        tension: 0.4  // Menambahkan smoothing pada garis
-                    },
-                    {
-                        label: 'Humidity',
-                        borderColor: 'rgb(135, 206, 235)',
-                        backgroundColor: 'rgba(135, 206, 235, 0.5)',
-                        data: [],
-                        pointStyle: 'circle',
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
-                        tension: 0.4  // Menambahkan smoothing pada garis
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 750, // Durasi animasi dalam milidetik
-                    easing: 'easeInOutQuart' // Tipe animasi
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
-                        },
-                        ticks: {
-                            color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
-                        },
-                        ticks: {
-                            color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
-                        }
-                    }
-                }
-            }
-        });
-
-        // Mobile Menu Toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        // Dark Mode Handler
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle');
-        
-        function toggleDarkMode() {
-            const root = document.documentElement;
-            const isDark = root.classList.contains('dark');
             
-            if (isDark) {
-                root.classList.remove('dark');
-                localStorage.setItem('darkMode', 'disabled');
-            } else {
-                root.classList.add('dark');
-                localStorage.setItem('darkMode', 'enabled');
+            document.querySelectorAll('#esp-status').forEach(el => {
+                el.textContent = statusText;
+                el.className = statusClass;
+            });
+        }, (error) => {
+            console.error('Error getting ESP status:', error);
+        });
+
+        // Tambahkan listener khusus untuk restart ESP
+        database.ref('control/restartESP').on('value', (snapshot) => {
+            const restartValue = snapshot.val();
+            console.log('ESP restart value:', restartValue);
+            
+            // Jika nilai restart adalah true, segera ubah status menjadi "Restarting..."
+            if (restartValue === true || restartValue === "true") {
+            document.querySelectorAll('#esp-status').forEach(el => {
+                    el.textContent = 'Restarting...';
+                    el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                });
+                
+                // Pertahankan status "Restarting..." selama 30 detik
+                                setTimeout(() => {
+                    // Cek status saat ini sebelum mengubahnya kembali
+                    database.ref('logs/systemESP').once('value', (snapshot) => {
+                        const currentStatus = snapshot.val();
+                        if (currentStatus !== 'Device online') {
+                            document.querySelectorAll('#esp-status').forEach(el => {
+                                el.textContent = 'Restarting...';
+                                el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                            });
+                        }
+                    });
+                }, 30000);
             }
-            updateChartsTheme();
+        });
+
+        // Fungsi untuk memperbarui status ESP di UI
+        function updateESPStatus(status) {
+            let statusText;
+            let statusClass;
+            
+            if (espRestartRequested) {
+                statusText = 'Restarting...';
+                statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
+            } else if (status === 'Device online') {
+                statusText = 'Online';
+                statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+            } else if (status === 'Device auto-restarting...' || status === 'Device restarting by command...') {
+                statusText = 'Restarting...';
+                statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
+            } else {
+                statusText = 'Offline';
+                statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
+            }
+            
+            document.querySelectorAll('#esp-status').forEach(el => {
+                el.textContent = statusText;
+                el.className = statusClass;
+            });
         }
 
-        // Check system preference and localStorage
-        if (localStorage.getItem('darkMode') === 'enabled' || 
-            (localStorage.getItem('darkMode') === null && 
-             window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
+        // Fungsi untuk memaksa perubahan pada DOM
+        function forceUpdate(id, text, className = null) {
+            try {
+                // Cari elemen dengan ID
+                const element = document.getElementById(id);
+                if (!element) {
+                    console.error(`Element with id ${id} not found`);
+                    return;
+                }
+
+                // Buat elemen baru dengan konten yang sama
+                const newElement = element.cloneNode(false);
+                newElement.innerHTML = text;
+                if (className) {
+                    newElement.className = className;
+                }
+                
+                // Ganti elemen lama dengan yang baru
+                element.parentNode.replaceChild(newElement, element);
+                
+                console.log(`Element ${id} forcefully updated with: ${text}`);
+            } catch (error) {
+                console.error(`Error updating element ${id}:`, error);
+            }
         }
 
-        darkModeToggle.addEventListener('click', toggleDarkMode);
-        mobileDarkModeToggle.addEventListener('click', toggleDarkMode);
-
-        // Update Tailwind dark mode classes
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.attributeName === 'class') {
-                    const isDark = document.documentElement.classList.contains('dark');
-                    document.body.className = isDark ? 'dark:bg-gray-900' : 'bg-gray-100';
-                    
-                    // Update all dark mode elements
-                    document.querySelectorAll('[class*="dark:"]').forEach(element => {
-                        const darkClasses = Array.from(element.classList)
-                            .filter(cls => cls.startsWith('dark:'));
-                        
-                        darkClasses.forEach(cls => {
-                            const lightClass = cls.replace('dark:', '');
-                            if (isDark) {
-                                element.classList.add(lightClass);
-                            } else {
-                                element.classList.remove(lightClass);
-                            }
-                        });
+        // Fungsi untuk memperbarui semua data dari snapshot
+        function updateAllFromSnapshot(path, data) {
+            console.log(`Updating all from ${path}:`, data);
+            
+            if (path === 'smartcab') {
+                if (data.servo_status) {
+                    document.querySelectorAll('#door-status').forEach(el => {
+                        el.textContent = data.servo_status;
+                        el.className = `text-sm sm:text-lg font-semibold ${
+                            data.servo_status === 'Terkunci' ? 'text-green-500' : 'text-red-500'
+                        }`;
                     });
                 }
-            });
-        });
-
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
-
-        // Profile Menu
-        const profileButton = document.querySelector('button img');
-        const profileMenu = document.getElementById('profileMenu');
-        
-        profileButton.addEventListener('click', () => {
-            profileMenu.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
-                profileMenu.classList.add('hidden');
+                
+                if (data.last_access) {
+                    document.querySelectorAll('#last-access').forEach(el => {
+                        el.textContent = data.last_access;
+                    });
+                }
+                
+                if (data.status_device) {
+                    document.querySelectorAll('#status-device').forEach(el => {
+                        el.textContent = data.status_device;
+                    });
+                }
             }
-        });
+            else if (path === 'dht11') {
+                if (data.temperature) {
+                    document.querySelectorAll('#temp-value').forEach(el => {
+                        el.textContent = `${data.temperature}°C`;
+                    });
+                }
+            }
+            else if (path === 'logs') {
+                if (data.systemWemos) {
+                    const isOnline = data.systemWemos === 'Device Online';
+                    const statusText = isOnline ? 'Online' : 'Offline';
+                    const statusClass = `text-sm sm:text-lg font-semibold ${
+                        isOnline ? 'text-green-500' : 'text-red-500'
+                    }`;
+                    document.querySelectorAll('#wemos-status').forEach(el => {
+                        el.textContent = statusText;
+                        el.className = statusClass;
+                    });
+                }
+                
+                if (data.systemESP) {
+                    const isOnline = data.systemESP === 'Device online';
+                    const statusText = isOnline ? 'Online' : 'Offline';
+                    const statusClass = `text-sm sm:text-lg font-semibold ${
+                        isOnline ? 'text-green-500' : 'text-red-500'
+                    }`;
+                    document.querySelectorAll('#esp-status').forEach(el => {
+                        el.textContent = statusText;
+                        el.className = statusClass;
+                    });
+                }
+            }
+            else if (path === 'security') {
+                if (data.status) {
+                    document.querySelectorAll('#security-status').forEach(el => {
+                        el.textContent = data.status;
+                    });
+                }
+                
+                if (data.fan) {
+                    const statusText = data.fan === 'ON' ? 'Aktif' : 'Mati';
+                    const statusClass = `text-sm sm:text-lg font-semibold ${
+                        data.fan === 'ON' ? 'text-green-500' : 'text-red-500'
+                    }`;
+                    document.querySelectorAll('#fan-status').forEach(el => {
+                        el.textContent = statusText;
+                        el.className = statusClass;
+                    });
+                }
+                
+                if (data.motion) {
+                    const statusText = data.motion === 'clear' ? 'Aman' : 'Terdeteksi';
+                    const statusClass = `text-sm sm:text-lg font-semibold ${
+                        data.motion === 'clear' ? 'text-green-500' : 'text-red-500'
+                    }`;
+                    document.querySelectorAll('#motion-status').forEach(el => {
+                        el.textContent = statusText;
+                        el.className = statusClass;
+                    });
+                }
+            }
+        }
 
-        // Function to update charts theme
-        function updateChartsTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#fff' : '#000';
-            const gridColor = isDark ? '#374151' : '#e5e7eb';
-
-            // Update both charts
-            [sensorChart, lineChart].forEach(chart => {
-                if (chart) {
-                    chart.options.plugins.legend.labels.color = textColor;
-                    if (chart.options.scales) {
-                        Object.values(chart.options.scales).forEach(scale => {
-                            scale.ticks.color = textColor;
-                            scale.grid.color = gridColor;
+        // Fungsi untuk setup listeners dengan pendekatan baru
+        function setupListeners() {
+            console.log('Setting up all listeners with new approach...');
+            
+            // Hapus semua listener yang ada
+            database.ref().off();
+            
+            // Listener untuk smartcab dengan pendekatan langsung
+            database.ref('smartcab').on('value', (snapshot) => {
+                const data = snapshot.val();
+                console.log('Smartcab data received:', data);
+                
+                if (data) {
+                    // Update door status
+                    if (data.servo_status) {
+                        document.querySelectorAll('#door-status').forEach(el => {
+                            el.textContent = data.servo_status;
+                            el.className = `text-sm sm:text-lg font-semibold ${
+                                data.servo_status === 'Terkunci' ? 'text-green-500' : 'text-red-500'
+                            }`;
                         });
                     }
-                    chart.update();
-                }
-            });
-        }
-
-        // Charts configuration
-        let lineChart;
-
-        // Initialize charts
-        function initializeCharts() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#fff' : '#000';
-            const gridColor = isDark ? '#374151' : '#e5e7eb';
-
-            // Line Chart
-            const lineCtx = document.getElementById('lineChart').getContext('2d');
-            lineChart = new Chart(lineCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Revenue',
-                        data: [65, 59, 80, 81, 56, 55],
-                        borderColor: '#3B82F6',
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: textColor
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: textColor
-                            },
-                            grid: {
-                                color: gridColor
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: textColor
-                            },
-                            grid: {
-                                color: gridColor
-                            }
-                        }
+                    
+                    // Update last access
+                    if (data.last_access) {
+                        document.querySelectorAll('#last-access').forEach(el => {
+                            el.textContent = data.last_access;
+                        });
+                    }
+                    
+                    // Update card ID
+                    if (data.status_device) {
+                        document.querySelectorAll('#status-device').forEach(el => {
+                            el.textContent = data.status_device;
+                        });
                     }
                 }
+            }, (error) => {
+                console.error('Error getting smartcab data:', error);
             });
+            
+            // Listener untuk temperature
+            database.ref('dht11/temperature').on('value', (snapshot) => {
+                const temp = snapshot.val();
+                console.log('Temperature data received:', temp);
+                if (temp) {
+                    document.querySelectorAll('#temp-value').forEach(el => {
+                        el.textContent = `${temp}°C`;
+                    });
+                }
+            }, (error) => {
+                console.error('Error getting temperature data:', error);
+            });
+            
+            // Listener untuk Wemos status
+            database.ref('logs/systemWemos').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Wemos status received:', status);
+                
+                let statusText;
+                let statusClass;
+                
+                if (status === 'Device Online') {
+                    statusText = 'Online';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+                } else if (status === 'Device auto-restarting...') {
+                    statusText = 'Restarting...';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                } else {
+                    statusText = 'Offline';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
+                }
+                
+                document.querySelectorAll('#wemos-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = statusClass;
+                });
+            }, (error) => {
+                console.error('Error getting Wemos status:', error);
+            });
+            
+            // Listener untuk ESP status
+            database.ref('logs/systemESP').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('ESP status received:', status);
+                
+                let statusText;
+                let statusClass;
+                
+                if (status === 'Device online') {
+                    statusText = 'Online';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+                } else if (status === 'Device auto-restarting...' || status === 'Device restarting by command...') {
+                    statusText = 'Restarting...';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                } else {
+                    statusText = 'Offline';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
+                }
+                
+                document.querySelectorAll('#esp-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = statusClass;
+                });
+            }, (error) => {
+                console.error('Error getting ESP status:', error);
+            });
+            
+            // Listener untuk security status
+            database.ref('security/status').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Security status received:', status);
+                
+                document.querySelectorAll('#security-status').forEach(el => {
+                    el.textContent = status;
+                });
+            }, (error) => {
+                console.error('Error getting security status:', error);
+            });
+            
+            // Listener untuk fan status
+            database.ref('security/fan').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Fan status received:', status);
+                
+                const statusText = status === 'ON' ? 'Aktif' : 'Mati';
+                
+                document.querySelectorAll('#fan-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `text-sm sm:text-lg font-semibold ${
+                        status === 'ON' ? 'text-green-500' : 'text-red-500'
+                    }`;
+                });
+            }, (error) => {
+                console.error('Error getting fan status:', error);
+            });
+            
+            // Listener untuk motion status
+            database.ref('security/motion').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Motion status received:', status);
+                
+                let statusText, statusClass;
+                
+                if (status === 'clear') {
+                    statusText = 'Aman';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+                } else if (status === 'detected') {
+                    statusText = 'Terdeteksi';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
+                } else if (status === 'disabled') {
+                    statusText = 'Dinonaktifkan';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-gray-500';
+                }
+                
+                document.querySelectorAll('#motion-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = statusClass;
+                });
+            }, (error) => {
+                console.error('Error getting motion status:', error);
+            });
+            
+            console.log('All listeners setup complete with new approach');
         }
 
-        // Add these functions to your existing script
+        // Fungsi untuk toggle modal
         function toggleModal() {
             const modal = document.getElementById('controlModal');
-            modal.classList.toggle('hidden');
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // Fungsi untuk restart perangkat
+        function setupRestartButtons() {
+            const restartWemos = document.getElementById('restartWemos');
+            if (restartWemos) {
+                restartWemos.addEventListener('click', function() {
+                    if (confirm('Apakah Anda yakin ingin me-restart Wemos D1 Mini?')) {
+                        // Perbarui status restart di UI terlebih dahulu
+                        document.querySelectorAll('#wemos-status').forEach(el => {
+                            el.textContent = 'Restarting...';
+                            el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                        });
+                        
+                        // Perbarui status di Firebase
+                        database.ref('logs/systemWemos').set('Device auto-restarting...')
+                            .then(() => {
+                                console.log('Status Wemos diperbarui ke restarting');
+                                
+                                // Kirim perintah restart
+                                return database.ref('control/restartWemos').set(true);
+                            })
+                            .then(() => {
+                                alert('Perintah restart Wemos D1 Mini berhasil dikirim');
+                                
+                                // Reset perintah restart setelah 5 detik
+                                setTimeout(() => {
+                                    database.ref('control/restartWemos').set(false);
+                                }, 5000);
+                            })
+                            .catch(error => {
+                                console.error('Error restarting Wemos:', error);
+                                alert('Gagal mengirim perintah restart');
+                                
+                                // Kembalikan status jika gagal
+                                database.ref('logs/systemWemos').once('value', (snapshot) => {
+                                    const previousStatus = snapshot.val();
+                                    if (previousStatus === 'Device auto-restarting...') {
+                                        database.ref('logs/systemWemos').set('Device Online');
+                                    }
+                                });
+                            });
+                    }
+                });
+            }
             
-            // Update toggle state when modal opens
-            if (!modal.classList.contains('hidden')) {
-                database.ref('security/status').once('value', (snapshot) => {
-                    const status = snapshot.val();
-                    document.getElementById('securityToggle').checked = status === 'on';
+            const restartESP = document.getElementById('restartESP');
+            if (restartESP) {
+                restartESP.addEventListener('click', function() {
+                    if (confirm('Apakah Anda yakin ingin me-restart NodeMCU ESP8266?')) {
+                        // Perbarui status restart di UI terlebih dahulu
+                        document.querySelectorAll('#esp-status').forEach(el => {
+                            el.textContent = 'Restarting...';
+                            el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                        });
+                        
+                        // Perbarui status di Firebase
+                        database.ref('logs/systemESP').set('Device restarting by command...')
+                            .then(() => {
+                                console.log('Status ESP diperbarui ke restarting');
+                                
+                                // Kirim perintah restart
+                                return database.ref('control/restartESP').set(true);
+                            })
+                            .then(() => {
+                                alert('Perintah restart NodeMCU ESP8266 berhasil dikirim');
+                                
+                                // Reset perintah restart setelah 5 detik
+                                setTimeout(() => {
+                                    database.ref('control/restartESP').set(false);
+                                }, 5000);
+                            })
+                            .catch(error => {
+                                console.error('Error restarting ESP:', error);
+                                alert('Gagal mengirim perintah restart');
+                                
+                                // Kembalikan status jika gagal
+                                database.ref('logs/systemESP').once('value', (snapshot) => {
+                                    const previousStatus = snapshot.val();
+                                    if (previousStatus === 'Device restarting by command...') {
+                                        database.ref('logs/systemESP').set('Device online');
+                                    }
+                                });
+                            });
+                    }
                 });
             }
         }
 
-        // Add these functions for door lock functionality
-        let isDoorLocked = true; // Initial state
+        // Fungsi untuk setup mobile menu
+        function setupMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
 
-        function toggleDoorLock() {
-            isDoorLocked = !isDoorLocked;
-            updateDoorStatus();
-            
-            // Simulate last access update
-            const now = new Date();
-            document.getElementById('last-access').textContent = now.toLocaleTimeString();
-            
-            // Here you would typically update Firebase
-            // Uncomment when ready to connect to Firebase
-            /*
-            const doorRef = database.ref('door');
-            doorRef.update({
-                status: isDoorLocked ? 'locked' : 'unlocked',
-                lastAccess: now.toISOString(),
-                deviceStatus: 'online'
-            }).catch(error => {
-                console.error('Error updating door status:', error);
-                isDoorLocked = !isDoorLocked; // Revert state if update fails
-                updateDoorStatus();
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            const profileButton = document.querySelector('button img');
+            const profileMenu = document.getElementById('profileMenu');
+
+            if (profileButton && profileMenu) {
+                profileButton.addEventListener('click', () => {
+                    profileMenu.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!profileButton.contains(e.target) && !profileMenu.contains(e.target)) {
+                        profileMenu.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // Tambahkan fungsi untuk memastikan UI diperbarui secara real-time
+        function forceRefreshDeviceStatus() {
+            // Update ESP8266 status dari Firebase
+            database.ref('logs/systemESP').once('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Forcing refresh of ESP status:', status);
+                
+                let statusText, statusClass;
+                
+                if (status === 'Device online') {
+                    statusText = 'Online';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+                } else if (status === 'Device auto-restarting...' || status === 'Device restarting by command...') {
+                    statusText = 'Restarting...';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                } else {
+                    statusText = 'Offline';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
+                }
+                
+                document.querySelectorAll('#esp-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = statusClass;
+                });
             });
-            */
+            
+            // Update Wemos status dari Firebase
+            database.ref('logs/systemWemos').once('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Forcing refresh of Wemos status:', status);
+                
+                let statusText, statusClass;
+                
+                if (status === 'Device Online') {
+                    statusText = 'Online';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-green-500';
+                } else if (status === 'Device auto-restarting...') {
+                    statusText = 'Restarting...';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                } else {
+                    statusText = 'Offline';
+                    statusClass = 'text-sm sm:text-lg font-semibold text-red-500';
+                }
+                
+                document.querySelectorAll('#wemos-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = statusClass;
+                });
+            });
         }
 
-        function updateDoorStatus() {
-            const doorStatus = document.getElementById('servo-status');
-            if (doorStatus) {
-                doorStatus.textContent = isDoorLocked ? 'Locked' : 'Unlocked';
-                doorStatus.className = isDoorLocked 
-                    ? 'text-lg font-semibold text-green-600 dark:text-green-400'
-                    : 'text-lg font-semibold text-red-600 dark:text-red-400';
+        // Fungsi untuk memeriksa status online/offline perangkat
+        function checkDeviceStatus() {
+            const currentTime = Math.floor(Date.now() / 1000); // Konversi ke detik
+            
+            // Tambahkan pengecekan lebih agresif untuk ESP
+            database.ref('device/lastActive').once('value', (snapshot) => {
+                const lastActiveESP = snapshot.val();
+                
+                if (lastActiveESP) {
+                    const timeDiff = currentTime - lastActiveESP;
+                    
+                    console.log('ESP8266 last active: ' + lastActiveESP);
+                    console.log('Current time: ' + currentTime);
+                    console.log('Time difference: ' + timeDiff + ' seconds');
+                    
+                    // Jika perbedaan waktu lebih dari 65 detik, set status offline
+                    if (timeDiff > 60) {
+                        console.log('ESP8266 terdeteksi offline - mengirim status ke Firebase...');
+                        
+                        database.ref('logs/systemESP').set('Device offline')
+                            .then(() => {
+                                console.log('Status ESP diperbarui ke offline');
+                            })
+                            .catch(error => {
+                                console.error('Error updating ESP status:', error);
+                            });
+                    }
+                } else {
+                    // Jika lastActive tidak ada, set status offline
+                    console.log('ESP8266 lastActive tidak ditemukan - set status offline');
+                    database.ref('logs/systemESP').set('Device offline');
+                }
+            });
+            
+            // Tambahkan pengecekan lebih agresif untuk Wemos
+            database.ref('device/lastActiveWemos').once('value', (snapshot) => {
+                const lastActiveWemos = snapshot.val();
+                
+                if (lastActiveWemos) {
+                    const timeDiff = currentTime - lastActiveWemos;
+                    
+                    console.log('Wemos D1 Mini last active: ' + lastActiveWemos);
+                    console.log('Current time: ' + currentTime);
+                    console.log('Time difference: ' + timeDiff + ' seconds');
+                    
+                    // Jika perbedaan waktu lebih dari 65 detik, set status offline
+                    if (timeDiff > 60) {
+                        console.log('Wemos D1 Mini terdeteksi offline - mengirim status ke Firebase...');
+                        
+                        database.ref('logs/systemWemos').set('Device Offline')
+                            .then(() => {
+                                console.log('Status Wemos diperbarui ke offline');
+                            })
+                            .catch(error => {
+                                console.error('Error updating Wemos status:', error);
+                            });
+                    }
+                } else {
+                    // Jika lastActiveWemos tidak ada, set status offline
+                    console.log('Wemos lastActive tidak ditemukan - set status offline');
+                    database.ref('logs/systemWemos').set('Device Offline');
+                }
+            });
+        }
+
+        // Function to toggle security system (updated with lowercase values)
+        function toggleSecurity(checkbox) {
+            // Get the current state (checked = on, unchecked = off)
+            const isEnabled = checkbox.checked;
+            const securityStatus = isEnabled ? 'on' : 'off';
+            
+            console.log(`Toggling security system to: ${securityStatus}`);
+            
+            // Update Firebase with the new status
+            database.ref('security/status').set(securityStatus)
+                .then(() => {
+                    console.log(`Security status updated to: ${securityStatus}`);
+                    
+                    // Also update motion to disabled when turned off
+                    if (!isEnabled) {
+                        return database.ref('security/motion').set('disabled');
+                    }
+                })
+                .then(() => {
+                    if (!isEnabled) {
+                        console.log('Motion sensor disabled');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating security status:', error);
+                    // Revert the checkbox state if there was an error
+                    checkbox.checked = !isEnabled;
+                    alert(`Failed to update security status: ${error.message}`);
+                });
+        }
+
+        // Add this code to initialize the toggle based on current state (inside window.load event)
+        function initializeSecurityToggle() {
+            const securityToggle = document.getElementById('securityToggle');
+            if (securityToggle) {
+                // Get the current security status from Firebase
+                database.ref('security/status').once('value', (snapshot) => {
+                    const status = snapshot.val();
+                    console.log('Current security status:', status);
+                    
+                    // Set the toggle based on the status
+                    securityToggle.checked = (status === 'on');
+                });
+                
+                // Also set up a listener to keep the toggle in sync
+                database.ref('security/status').on('value', (snapshot) => {
+                    const status = snapshot.val();
+                    console.log('Security status changed:', status);
+                    
+                    // Only update if the value doesn't match (to prevent loops)
+                    if (securityToggle.checked !== (status === 'on')) {
+                        securityToggle.checked = (status === 'on');
+                    }
+                });
             }
         }
 
-        // Add to your document ready function
-        document.addEventListener('DOMContentLoaded', () => {
-            // ... existing initialization code ...
+        // Inisialisasi semua fungsi saat window load
+        window.addEventListener('load', function() {
+            console.log('Window loaded, initializing...');
             
-            // Initialize door status
-            updateDoorStatus();
-            
-            // Update device status periodically
-            setInterval(() => {
-                const deviceStatus = document.getElementById('device-status');
-                if (deviceStatus) {
-                    // Here you would typically check actual device connection
-                    deviceStatus.textContent = 'Online';
-                    deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
-                }
-            }, 5000);
+            // Tunggu sedikit untuk memastikan DOM sudah siap
+            setTimeout(function() {
+                setupListeners();
+                setupRestartButtons();
+                setupMobileMenu();
+                initializeSecurityToggle();
+                
+                // Jalankan pengecekan status perangkat segera dan lebih sering
+                checkDeviceStatus(); // Panggil saat awal
+                setInterval(checkDeviceStatus, 61000); // Periksa setiap 10 detik
+                
+                // Refresh UI lebih sering
+                forceRefreshDeviceStatus(); // Panggil saat awal
+                setInterval(forceRefreshDeviceStatus, 3000); // Refresh UI setiap 3 detik
+                
+                // Polling untuk listener
+                setInterval(function() {
+                    console.log('Refreshing listeners...');
+                    setupListeners();
+                }, 61000);
+                
+                console.log('Initialization complete');
+            }, 1000);
         });
 
-        // Function to update door status UI
-        function updateDoorStatus(data) {
-            if (data.smartcab) {
-                // Update servo status
-                const servoStatus = document.getElementById('servo-status');
-                if (servoStatus) {
-                    servoStatus.textContent = data.smartcab.servo_status;
-                    // Update color based on status
-                    if (data.smartcab.servo_status === 'terkunci') {
-                        servoStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
-                    } else if (data.smartcab.servo_status === 'terbuka') {
-                        servoStatus.className = 'text-lg font-semibold text-red-600 dark:text-red-400';
+        // Tambahkan listener untuk debugging
+        console.log('Script loaded');
+        
+        // Tambahkan interval untuk memaksa refresh DOM setiap 5 detik
+        setInterval(function() {
+            console.log('Forcing DOM refresh...');
+            
+            // Ambil data terbaru dari Firebase dan perbarui UI
+            database.ref('smartcab').once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    // Update door status
+                    if (data.servo_status) {
+                        document.querySelectorAll('#door-status').forEach(el => {
+                            el.textContent = data.servo_status;
+                            el.className = `text-sm sm:text-lg font-semibold ${
+                                data.servo_status === 'Terkunci' ? 'text-green-500' : 'text-red-500'
+                            }`;
+                        });
+                    }
+                    
+                    // Update last access
+                    if (data.last_access) {
+                        document.querySelectorAll('#last-access').forEach(el => {
+                            el.textContent = data.last_access;
+                        });
+                    }
+                    
+                    // Update card ID
+                    if (data.status_device) {
+                        document.querySelectorAll('#status-device').forEach(el => {
+                            el.textContent = data.status_device;
+                        });
                     }
                 }
-
-                // Update last access
-                const lastAccess = document.getElementById('last-access');
-                if (lastAccess) {
-                    lastAccess.textContent = data.smartcab.last_access;
-                }
-
-                // Update device status
-                const deviceStatus = document.getElementById('device-status');
-                if (deviceStatus) {
-                    deviceStatus.textContent = data.smartcab.status_device;
-                    // Update color based on status
-                    if (data.smartcab.status_device === 'Online') {
-                        deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
-                    } else {
-                        deviceStatus.className = 'text-lg font-semibold text-green-600 dark:text-green-400';
-                    }
-                }
-            }
-        }
-
-        // Listen for smartcab changes
-        database.ref('smartcab').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                updateDoorStatus(data);
-            }
-        });
+            });
+        }, 5000);
     </script>
 </body>
 </html>
+
+
+<html lang="en">

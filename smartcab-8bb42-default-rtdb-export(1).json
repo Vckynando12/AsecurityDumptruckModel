@@ -1,0 +1,42 @@
+{
+  "control": {
+    "restartESP": false,
+    "restartWemos": false
+  },
+  "device": {
+    "lastActive": 1742129368,
+    "lastActiveWemos": 7
+  },
+  "dht11": {
+    "humidity": 78,
+    "temperature": 27
+  },
+  "logs": {
+    "RFID": {
+      "status": "Connected"
+    },
+    "dht": {
+      "message": "DHT11 terhubung dengan baik",
+      "status": "connected"
+    },
+    "mpu": {
+      "message": "MPU6050 terhubung dengan baik",
+      "status": "connected"
+    },
+    "servo": {
+      "status": "Connected"
+    },
+    "systemESP": "Device online",
+    "systemWemos": "Device Online"
+  },
+  "security": {
+    "fan": "OFF",
+    "motion": "clear",
+    "status": "on"
+  },
+  "smartcab": {
+    "last_access": "Terdaftar",
+    "servo_status": "Terbuka",
+    "status_device": "53ed8434"
+  }
+}
