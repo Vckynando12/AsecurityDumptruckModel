@@ -9,6 +9,7 @@
     <script src="{{ asset('js/notification-constants.js') }}"></script>
     <script src="{{ asset('js/notifications.js') }}"></script>
     <link href="{{ asset('css/notifications.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900" x-data="{ isNotificationsPanelOpen: false }">
     <!-- Navbar -->
@@ -25,9 +26,9 @@
                 
                 <!-- Mobile Right Menu -->
                 <div class="flex items-center gap-2 lg:hidden">
-                    <a href="{{route('ai.chat')}}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    {{-- <a href="{{route('ai.chat')}}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
                         AI
-                    </a>
+                    </a> --}}
                     <!-- Notification Button Mobile -->
                     <button 
                         @click="isNotificationsPanelOpen = true"
@@ -49,9 +50,9 @@
                 <!-- Desktop Menu -->
                 <div class="hidden lg:flex items-center gap-4">
                     <!-- Menu Items -->
-                    <a href="{{route('ai.chat')}}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    {{-- <a href="{{route('ai.chat')}}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
                         AI
-                    </a>
+                    </a> --}}
                     
                     
                     <!-- Notification Button -->
@@ -414,20 +415,19 @@
 
             <!-- Bottom Section -->
             <div class="mt-6 sm:mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Information Box -->
+                <!-- Existing Information Box -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                     <div class="flex items-center">
                         <div class="p-2 bg-yellow-100 rounded-full mr-4">
                             <svg class="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
-                    </div>
+                        </div>
                         <h3 class="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">Keterangan</h3>
                     </div>
                     <div class="mt-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <p><b>⚠︎ Data perangkat Wemos D1 Mini dan NodeMCU ESP8266 memiliki jeda 1 menit. Saat pengecekan, tunggu 1 menit untuk melihat perubahan data.</b></p>
-                        <p>•Jika anda restart wemos d1 mini maka perangkat RFID dan servo akan ikut dimulai ulang / di restart</p>
-                        <p>•Jika anda restart NodeMCU Esp8266 maka perangkat kipas,alarm,DHT 11,dan Mpu6050 akan ikut di mulai ulang</p>
+                        <p>⚠︎ Data perangkat Wemos D1 Mini dan NodeMCU ESP8266 memiliki jeda 1 menit. Saat pengecekan, tunggu 1 menit untuk melihat perubahan data.</p>
+                        <button id="openGuide" class="mt-2 px-4 py-2 bg-yellow-500 bg-opacity-40 text-dark rounded hover:bg-opacity-50"><b> Lihat panduan lengkapnya</b></button>
                     </div>
                 </div>
 
@@ -527,6 +527,33 @@
                     <input type="checkbox" id="securityToggle" class="sr-only peer" onchange="toggleSecurity(this)">
                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                 </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="guideModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="toggleGuideModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-11/12 max-w-md">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Panduan Lengkap</h3>
+                <div class="flex items-start mb-2">
+                    <div class="p-2 bg-blue-100 rounded-full mr-2">
+                        <svg class="w-5 h-5 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m0 14v1m8-8h1M4 12H3m15.364-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707-.707M6.343 6.343l-.707-.707"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Jika anda restart wemos d1 mini maka perangkat RFID dan servo akan ikut dimulai ulang / di restart</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="p-2 bg-blue-100 rounded-full mr-2">
+                        <svg class="w-5 h-5 text-blue-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m0 14v1m8-8h1M4 12H3m15.364-6.364l.707.707M6.343 17.657l-.707.707M17.657 17.657l.707-.707M6.343 6.343l-.707-.707"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Jika anda restart NodeMCU Esp8266 maka perangkat kipas, alarm, DHT 11, dan Mpu6050 akan ikut di mulai ulang</p>
+                </div>
+                <button class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="toggleGuideModal()">Tutup</button>
             </div>
         </div>
     </div>
@@ -932,84 +959,142 @@
             const restartWemos = document.getElementById('restartWemos');
             if (restartWemos) {
                 restartWemos.addEventListener('click', function() {
-                    if (confirm('Apakah Anda yakin ingin me-restart Wemos D1 Mini?')) {
-                        // Perbarui status restart di UI terlebih dahulu
-                        document.querySelectorAll('#wemos-status').forEach(el => {
-                            el.textContent = 'Restarting...';
-                            el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
-                        });
-                        
-                        // Perbarui status di Firebase
-                        database.ref('logs/systemWemos').set('Device auto-restarting...')
-                            .then(() => {
-                                console.log('Status Wemos diperbarui ke restarting');
-                                
-                                // Kirim perintah restart
-                                return database.ref('control/restartWemos').set(true);
-                            })
-                            .then(() => {
-                                alert('Perintah restart Wemos D1 Mini berhasil dikirim');
-                                
-                                // Reset perintah restart setelah 5 detik
-                                setTimeout(() => {
-                                    database.ref('control/restartWemos').set(false);
-                                }, 5000);
-                            })
-                            .catch(error => {
-                                console.error('Error restarting Wemos:', error);
-                                alert('Gagal mengirim perintah restart');
-                                
-                                // Kembalikan status jika gagal
-                                database.ref('logs/systemWemos').once('value', (snapshot) => {
-                                    const previousStatus = snapshot.val();
-                                    if (previousStatus === 'Device auto-restarting...') {
-                                        database.ref('logs/systemWemos').set('Device Online');
-                                    }
-                                });
-                            });
+                    // Cek status Wemos sebelum menampilkan dialog
+                    const wemosStatus = document.querySelector('#wemos-status').textContent;
+                    if (wemosStatus === 'Offline') {
+                        Swal.fire(
+                            'Tidak Dapat Melakukan Restart',
+                            'Perangkat Wemos D1 Mini sedang offline.',
+                            'error'
+                        );
+                        return;
                     }
+
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: "Anda ingin me-restart Wemos D1 Mini?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, restart!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Perbarui status restart di UI terlebih dahulu
+                            document.querySelectorAll('#wemos-status').forEach(el => {
+                                el.textContent = 'Restarting...';
+                                el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                            });
+                            
+                            // Perbarui status di Firebase
+                            database.ref('logs/systemWemos').set('Device auto-restarting...')
+                                .then(() => {
+                                    console.log('Status Wemos diperbarui ke restarting');
+                                    
+                                    // Kirim perintah restart
+                                    return database.ref('control/restartWemos').set(true);
+                                })
+                                .then(() => {
+                                    Swal.fire(
+                                        'Berhasil!',
+                                        'Perintah restart Wemos D1 Mini berhasil dikirim.',
+                                        'success'
+                                    );
+                                    
+                                    // Reset perintah restart setelah 5 detik
+                                    setTimeout(() => {
+                                        database.ref('control/restartWemos').set(false);
+                                    }, 5000);
+                                })
+                                .catch(error => {
+                                    console.error('Error restarting Wemos:', error);
+                                    Swal.fire(
+                                        'Gagal!',
+                                        'Gagal mengirim perintah restart.',
+                                        'error'
+                                    );
+                                    
+                                    // Kembalikan status jika gagal
+                                    database.ref('logs/systemWemos').once('value', (snapshot) => {
+                                        const previousStatus = snapshot.val();
+                                        if (previousStatus === 'Device auto-restarting...') {
+                                            database.ref('logs/systemWemos').set('Device Online');
+                                        }
+                                    });
+                                });
+                        }
+                    });
                 });
             }
             
             const restartESP = document.getElementById('restartESP');
             if (restartESP) {
                 restartESP.addEventListener('click', function() {
-                    if (confirm('Apakah Anda yakin ingin me-restart NodeMCU ESP8266?')) {
-                        // Perbarui status restart di UI terlebih dahulu
-                        document.querySelectorAll('#esp-status').forEach(el => {
-                            el.textContent = 'Restarting...';
-                            el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
-                        });
-                        
-                        // Perbarui status di Firebase
-                        database.ref('logs/systemESP').set('Device restarting by command...')
-                            .then(() => {
-                                console.log('Status ESP diperbarui ke restarting');
-                                
-                                // Kirim perintah restart
-                                return database.ref('control/restartESP').set(true);
-                            })
-                            .then(() => {
-                                alert('Perintah restart NodeMCU ESP8266 berhasil dikirim');
-                                
-                                // Reset perintah restart setelah 5 detik
-                                setTimeout(() => {
-                                    database.ref('control/restartESP').set(false);
-                                }, 5000);
-                            })
-                            .catch(error => {
-                                console.error('Error restarting ESP:', error);
-                                alert('Gagal mengirim perintah restart');
-                                
-                                // Kembalikan status jika gagal
-                                database.ref('logs/systemESP').once('value', (snapshot) => {
-                                    const previousStatus = snapshot.val();
-                                    if (previousStatus === 'Device restarting by command...') {
-                                        database.ref('logs/systemESP').set('Device online');
-                                    }
-                                });
-                            });
+                    // Cek status ESP sebelum menampilkan dialog
+                    const espStatus = document.querySelector('#esp-status').textContent;
+                    if (espStatus === 'Offline') {
+                        Swal.fire(
+                            'Tidak Dapat Melakukan Restart',
+                            'Perangkat NodeMCU ESP8266 sedang offline.',
+                            'error'
+                        );
+                        return;
                     }
+
+                    Swal.fire({
+                        title: 'Apakah Anda yakin?',
+                        text: "Anda ingin me-restart NodeMCU ESP8266?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, restart!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Perbarui status restart di UI terlebih dahulu
+                            document.querySelectorAll('#esp-status').forEach(el => {
+                                el.textContent = 'Restarting...';
+                                el.className = 'text-sm sm:text-lg font-semibold text-yellow-500';
+                            });
+                            
+                            // Perbarui status di Firebase
+                            database.ref('logs/systemESP').set('Device restarting by command...')
+                                .then(() => {
+                                    console.log('Status ESP diperbarui ke restarting');
+                                    
+                                    // Kirim perintah restart
+                                    return database.ref('control/restartESP').set(true);
+                                })
+                                .then(() => {
+                                    Swal.fire(
+                                        'Berhasil!',
+                                        'Perintah restart NodeMCU ESP8266 berhasil dikirim.',
+                                        'success'
+                                    );
+                                    
+                                    // Reset perintah restart setelah 5 detik
+                                    setTimeout(() => {
+                                        database.ref('control/restartESP').set(false);
+                                    }, 5000);
+                                })
+                                .catch(error => {
+                                    console.error('Error restarting ESP:', error);
+                                    Swal.fire(
+                                        'Gagal!',
+                                        'Gagal mengirim perintah restart.',
+                                        'error'
+                                    );
+                                    
+                                    // Kembalikan status jika gagal
+                                    database.ref('logs/systemESP').once('value', (snapshot) => {
+                                        const previousStatus = snapshot.val();
+                                        if (previousStatus === 'Device restarting by command...') {
+                                            database.ref('logs/systemESP').set('Device online');
+                                        }
+                                    });
+                                });
+                        }
+                    });
                 });
             }
         }
@@ -1280,9 +1365,20 @@
                 }
             });
         }, 5000);
+
+        // Function to toggle the guide modal
+        function toggleGuideModal() {
+            const guideModal = document.getElementById('guideModal');
+            if (guideModal) {
+                guideModal.classList.toggle('hidden');
+            }
+        }
+
+        // Add event listener to the guide button
+        document.getElementById('openGuide').addEventListener('click', function(event) {
+            event.preventDefault();
+            toggleGuideModal();
+        });
     </script>
 </body>
 </html>
-
-
-<html lang="en">
