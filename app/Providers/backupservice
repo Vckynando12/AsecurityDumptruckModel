@@ -34,7 +34,7 @@ class FirebaseServiceProvider extends ServiceProvider
     }
 }
 
-koneksi web
+koneksi web lokal
 <?php
 
 namespace App\Providers;

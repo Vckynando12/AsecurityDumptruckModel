@@ -20,7 +20,7 @@
                     <img src="{{ asset('asset/logo.png') }}" alt="SmartCab Logo" class="h-8 w-8 lg:h-10 lg:w-10 mr-2">
                     <div class="flex flex-col">
                         <span class="text-base lg:text-xl font-semibold dark:text-white">SMARTCAB</span>
-                        <span class="text-xs lg:text-sm font-medium dark:text-white">Smart Cabin Security & Monitoring</span>
+                        <span class="text-xs lg:text-sm font-medium dark:text-gray-400">Smart Cabin Security & Monitoring</span>
                     </div>
                 </div>
                 
@@ -277,7 +277,7 @@
                         <!-- DHT 11 -->
                         <div class="flex items-center">
                             <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                <img src="{{ asset('asset/dht.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="DHT11">
+                                <img src="{{ asset('asset/dht.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="DHT11" onclick="openImageModal('{{ asset('asset/dht.png') }}')">
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">DHT 11</p>
@@ -288,7 +288,7 @@
                         <!-- MPU 6050 -->
                         <div class="flex items-center">
                             <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                <img src="{{ asset('asset/mpu.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="MPU6050">
+                                <img src="{{ asset('asset/mpu.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="MPU6050" onclick="openImageModal('{{ asset('asset/mpu.png') }}')">
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">MPU 6050</p>
@@ -299,7 +299,7 @@
                         <!-- Servo MG996r -->
                         <div class="flex items-center">
                             <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                <img src="{{ asset('asset/servo.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="Servo">
+                                <img src="{{ asset('asset/servo.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="Servo" onclick="openImageModal('{{ asset('asset/servo.png') }}')">
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Servo MG996r</p>
@@ -310,7 +310,7 @@
                         <!-- RFID Reader -->
                         <div class="flex items-center">
                             <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                <img src="{{ asset('asset/rfid.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="RFID">
+                                <img src="{{ asset('asset/rfid.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="RFID" onclick="openImageModal('{{ asset('asset/rfid.png') }}')">
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">RFID Reader</p>
@@ -340,7 +340,7 @@
                             <!-- DHT 11 -->
                             <div class="flex items-center">
                                 <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                    <img src="{{ asset('asset/dht.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="DHT11">
+                                    <img src="{{ asset('asset/dht.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="DHT11" onclick="openImageModal('{{ asset('asset/dht.png') }}')">
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">DHT 11</p>
@@ -351,7 +351,7 @@
                             <!-- MPU 6050 -->
                             <div class="flex items-center">
                                 <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                    <img src="{{ asset('asset/mpu.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="MPU6050">
+                                    <img src="{{ asset('asset/mpu.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="MPU6050" onclick="openImageModal('{{ asset('asset/mpu.png') }}')">
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">MPU 6050</p>
@@ -362,7 +362,7 @@
                             <!-- Servo MG996r -->
                             <div class="flex items-center">
                                 <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                    <img src="{{ asset('asset/servo.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="Servo">
+                                    <img src="{{ asset('asset/servo.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="Servo" onclick="openImageModal('{{ asset('asset/servo.png') }}')">
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Servo MG996r</p>
@@ -373,7 +373,7 @@
                             <!-- RFID Reader -->
                             <div class="flex items-center">
                                 <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-cyan-100 rounded-full flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14">
-                                    <img src="{{ asset('asset/rfid.png') }}" class="w-6 h-6 sm:w-10 sm:h-10" alt="RFID">
+                                    <img src="{{ asset('asset/rfid.png') }}" class="w-6 h-6 sm:w-10 sm:h-10 cursor-pointer" alt="RFID" onclick="openImageModal('{{ asset('asset/rfid.png') }}')">
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">RFID Reader</p>
@@ -427,7 +427,7 @@
                     </div>
                     <div class="mt-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <p>⚠︎ Data perangkat Wemos D1 Mini dan NodeMCU ESP8266 memiliki jeda 1 menit. Saat pengecekan, tunggu 1 menit untuk melihat perubahan data.</p>
-                        <button id="openGuide" class="mt-2 px-4 py-2 bg-yellow-500 bg-opacity-40 text-dark rounded hover:bg-opacity-50"><b> Lihat panduan lengkapnya</b></button>
+                        <button id="openGuide" class="mt-2 px-4 py-2 bg-yellow-500 bg-opacity-30 text-dark rounded hover:bg-opacity-50"><b> Lihat panduan lengkapnya</b></button>
                     </div>
                 </div>
 
@@ -557,6 +557,38 @@
             </div>
         </div>
     </div>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="fixed inset-0 z-50 hidden">
+        <!-- Background overlay to close the modal -->
+        <div class="fixed inset-0 bg-black bg-opacity-50" onclick="closeImageModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 relative max-w-sm w-full">
+                <!-- Close button with "X" icon -->
+                <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white" onclick="closeImageModal()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <!-- Image displayed in the modal -->
+                <img id="modalImage" src="" alt="Large Image" class="max-w-full h-auto max-h-64">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modal.classList.remove('hidden'); // Show the modal
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden'); // Hide the modal
+        }
+    </script>
 
     <!-- Firebase SDK v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -1379,6 +1411,18 @@
             event.preventDefault();
             toggleGuideModal();
         });
+
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modal.classList.remove('hidden'); // Show the modal
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden'); // Hide the modal
+        }
     </script>
 </body>
 </html>
