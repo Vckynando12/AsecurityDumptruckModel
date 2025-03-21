@@ -35,4 +35,4 @@ Route::get('/', function () {
 
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-Route::get('/reports', [ReportController::class, 'index']);
+Route::get('/reports', [ReportController::class, 'index'])->name('reports');

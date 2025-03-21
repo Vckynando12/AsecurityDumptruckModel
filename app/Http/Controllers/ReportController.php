@@ -9,27 +9,63 @@ use Carbon\Carbon;
 class ReportController extends Controller
 {
     public function getReports()
-{
-    $jsonPath = storage_path('app/reports.json');
+    {
+        $jsonPath = storage_path('app/reports.json');
 
-    if (!File::exists($jsonPath)) {
-        return response()->json([]);
+        if (!File::exists($jsonPath)) {
+            return response()->json([]);
+        }
+
+        $jsonData = json_decode(File::get($jsonPath), true);
+
+        if (!$jsonData) {
+            return response()->json([]);
+        }
+
+        // Urutkan data berdasarkan timestamp (terbaru dulu)
+        usort($jsonData, function($a, $b) {
+            $timeA = strtotime($a['timestamp']);
+            $timeB = strtotime($b['timestamp']);
+            return $timeB - $timeA; // Descending order
+        });
+
+        foreach ($jsonData as &$report) {
+            $carbonTime = Carbon::parse($report['timestamp'])->setTimezone('Asia/Jakarta');
+            $report['tanggal'] = $carbonTime->format('d M Y');  // Format tanggal
+            $report['waktu'] = $carbonTime->format('H:i:s');     // Format waktu
+        }
+
+        return response()->json($jsonData);
     }
 
-    $jsonData = json_decode(File::get($jsonPath), true);
+    public function getLatestReport()
+    {
+        $jsonPath = storage_path('app/reports.json');
 
-    if (!$jsonData) {
-        return response()->json([]);
+        if (!File::exists($jsonPath)) {
+            return response()->json(null);
+        }
+
+        $jsonData = json_decode(File::get($jsonPath), true);
+
+        if (!$jsonData || empty($jsonData)) {
+            return response()->json(null);
+        }
+
+        // Urutkan data berdasarkan timestamp (terbaru dulu)
+        usort($jsonData, function($a, $b) {
+            $timeA = strtotime($a['timestamp']);
+            $timeB = strtotime($b['timestamp']);
+            return $timeB - $timeA; // Descending order
+        });
+
+        $latestReport = $jsonData[0];
+        $carbonTime = Carbon::parse($latestReport['timestamp'])->setTimezone('Asia/Jakarta');
+        $latestReport['tanggal'] = $carbonTime->format('d M Y');
+        $latestReport['waktu'] = $carbonTime->format('H:i:s');
+
+        return response()->json($latestReport);
     }
-
-    foreach ($jsonData as &$report) {
-        $carbonTime = Carbon::parse($report['timestamp'])->setTimezone('Asia/Jakarta');
-        $report['tanggal'] = $carbonTime->format('d M Y');  // Format tanggal
-        $report['waktu'] = $carbonTime->format('H:i:s');     // Format waktu
-    }
-
-    return response()->json($jsonData);
-}
 
     public function index()
     {
@@ -48,6 +84,13 @@ class ReportController extends Controller
         if (!$jsonData) {
             return view('reports', ['reports' => []]);
         }
+
+        // Urutkan data berdasarkan timestamp (terbaru dulu)
+        usort($jsonData, function($a, $b) {
+            $timeA = strtotime($a['timestamp']);
+            $timeB = strtotime($b['timestamp']);
+            return $timeB - $timeA; // Descending order
+        });
 
         // Konversi timestamp ke Waktu Indonesia Barat (WIB) dan pisahkan tanggal & waktu
         foreach ($jsonData as &$report) {

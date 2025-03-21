@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SensorDataController;
+use App\Http\Controllers\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/sensor-data', [SensorDataController::class, 'getData']);
+Route::get('/reports', [ReportController::class, 'getReports']);
+Route::get('/reports/latest', [ReportController::class, 'getLatestReport']);
