@@ -56,6 +56,23 @@ void setup() {
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
 
+  // Konfigurasi NTP dan tunggu sinkronisasi
+  configTime(7 * 3600, 0, "pool.ntp.org"); // GMT+7
+  Serial.println("Menunggu sinkronisasi waktu");
+  while (time(nullptr) < 1000000000) {
+    Serial.print(".");
+    delay(100);
+  }
+  Serial.println("\nWaktu tersinkronisasi!");
+
+  // Setelah waktu tersinkronisasi, baru kirim timestamp pertama
+  unsigned long epochTime = time(nullptr);
+  if (Firebase.setInt(firebaseData, "/device/lastActiveWemos", epochTime)) {
+    Serial.println("Initial timestamp sent: " + String(epochTime));
+  } else {
+    Serial.println("Failed to send initial timestamp");
+  }
+
   // Inisialisasi RFID
   SPI.begin();
   mfrc522.PCD_Init();
@@ -83,13 +100,6 @@ void setup() {
 
   // Update path untuk restart control
   Firebase.setBool(firebaseData, "/control/restartWemos", false);
-  
-  // Konfigurasi NTP
-  configTime(7 * 3600, 0, "pool.ntp.org"); // GMT+7
-  
-  // Kirim timestamp pertama kali
-  unsigned long epochTime = time(nullptr);
-  Firebase.setInt(firebaseData, "/device/lastActiveWemos", epochTime);
   
   // Update status device saat startup
   Firebase.setString(firebaseData, "/logs/systemWemos", "Device Online");

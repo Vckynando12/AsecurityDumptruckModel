@@ -43,59 +43,135 @@ class FetchFirebaseData extends Command
             // Ambil data terakhir jika ada
             $lastEntry = !empty($historyData) ? end($historyData) : null;
 
-            // Cek apakah ada perubahan pada security, smartcab, control, atau logs
+            // Cek perubahan pada setiap kategori data
+            $securityChanged = false;
+            $smartcabChanged = false;
+            $controlChanged = false;
+            $logsChanged = false;
+            $dht11Changed = false;
+            $deviceChanged = false;
             $hasChanges = false;
+
             if ($lastEntry === null) {
-                $hasChanges = true;
+                // Jika belum ada data, anggap semua kategori berubah (kecuali yang dikecualikan)
+                $securityChanged = !empty($securityData);
+                $smartcabChanged = !empty($smartcabData);
+                $controlChanged = !empty($controlData);
+                $logsChanged = !empty($logsData);
+                
+                // Untuk DHT11 dan Device, kita hanya anggap berubah jika ada data selain yang dikecualikan
+                $dht11Changed = !empty($dht11Data) && $this->hasNonTrivialDHT11Data($dht11Data);
+                $deviceChanged = !empty($deviceData) && $this->hasNonTrivialDeviceData($deviceData);
+                
+                $hasChanges = $securityChanged || $smartcabChanged || $controlChanged || 
+                              $logsChanged || $dht11Changed || $deviceChanged;
             } else {
+                // Cek perubahan pada setiap kategori
                 $securityChanged = $this->hasDataChanged($lastEntry['security'] ?? [], $securityData);
                 $smartcabChanged = $this->hasDataChanged($lastEntry['smartcab'] ?? [], $smartcabData);
                 $controlChanged = $this->hasDataChanged($lastEntry['control'] ?? [], $controlData);
                 $logsChanged = $this->hasDataChanged($lastEntry['logs'] ?? [], $logsData);
                 
-                $hasChanges = $securityChanged || $smartcabChanged || $controlChanged || $logsChanged;
+                // Untuk dht11 dan device kita periksa secara khusus, mengabaikan field yang sering berubah
+                $dht11Changed = $this->hasNonTrivialDHT11Changes($lastEntry['dht11'] ?? [], $dht11Data);
+                $deviceChanged = $this->hasNonTrivialDeviceChanges($lastEntry['device'] ?? [], $deviceData);
+                
+                $hasChanges = $securityChanged || $smartcabChanged || $controlChanged || 
+                              $logsChanged || $dht11Changed || $deviceChanged;
             }
 
-            // Hanya simpan jika ada perubahan
-            if ($hasChanges) {
-                $newData = [
-                    'id' => Str::uuid()->toString(), // Generate ID unik
-                    'timestamp' => now()->toIso8601String(),
+            // Proses setiap perubahan secara terpisah
+            $changesMade = false;
+            
+            // Buat template data lengkap
+            $fullData = [
                     'security' => $securityData,
                     'smartcab' => $smartcabData,
                     'control' => $controlData,
-                    'logs' => $logsData
-                ];
-
-                if (!empty($dht11Data)) {
-                    $newData['dht11'] = $dht11Data;
-                }
+                'logs' => $logsData,
+                'dht11' => $dht11Data,
+                'device' => $deviceData
+            ];
+            
+            // Simpan setiap perubahan secara terpisah dengan data lengkap
+            if ($securityChanged && !empty($securityData)) {
+                $newEntry = $fullData;
+                $newEntry['id'] = Str::uuid()->toString();
+                $newEntry['timestamp'] = now()->toIso8601String();
+                $newEntry['change_type'] = 'security'; // Tambahkan informasi apa yang berubah
                 
-                if (!empty($deviceData)) {
-                    $newData['device'] = $deviceData;
-                }
-
-                $historyData[] = $newData;
+                $historyData[] = $newEntry;
+                event(new ReportUpdated($newEntry, 'security'));
+                $this->info('Perubahan terdeteksi pada security, ID: ' . $newEntry['id']);
+                $changesMade = true;
+            }
+            
+            if ($smartcabChanged && !empty($smartcabData)) {
+                $newEntry = $fullData;
+                $newEntry['id'] = Str::uuid()->toString();
+                $newEntry['timestamp'] = now()->toIso8601String();
+                $newEntry['change_type'] = 'smartcab';
+                
+                $historyData[] = $newEntry;
+                event(new ReportUpdated($newEntry, 'smartcab'));
+                $this->info('Perubahan terdeteksi pada smartcab, ID: ' . $newEntry['id']);
+                $changesMade = true;
+            }
+            
+            if ($controlChanged && !empty($controlData)) {
+                $newEntry = $fullData;
+                $newEntry['id'] = Str::uuid()->toString();
+                $newEntry['timestamp'] = now()->toIso8601String();
+                $newEntry['change_type'] = 'control';
+                
+                $historyData[] = $newEntry;
+                event(new ReportUpdated($newEntry, 'control'));
+                $this->info('Perubahan terdeteksi pada control, ID: ' . $newEntry['id']);
+                $changesMade = true;
+            }
+            
+            if ($logsChanged && !empty($logsData)) {
+                $newEntry = $fullData;
+                $newEntry['id'] = Str::uuid()->toString();
+                $newEntry['timestamp'] = now()->toIso8601String();
+                $newEntry['change_type'] = 'logs';
+                
+                $historyData[] = $newEntry;
+                event(new ReportUpdated($newEntry, 'logs'));
+                $this->info('Perubahan terdeteksi pada logs, ID: ' . $newEntry['id']);
+                $changesMade = true;
+            }
+            
+            if ($dht11Changed && !empty($dht11Data)) {
+                $newEntry = $fullData;
+                $newEntry['id'] = Str::uuid()->toString();
+                $newEntry['timestamp'] = now()->toIso8601String();
+                $newEntry['change_type'] = 'dht11';
+                
+                $historyData[] = $newEntry;
+                event(new ReportUpdated($newEntry, 'dht11'));
+                $this->info('Perubahan signifikan terdeteksi pada dht11, ID: ' . $newEntry['id']);
+                $changesMade = true;
+            }
+            
+            if ($deviceChanged && !empty($deviceData)) {
+                $newEntry = $fullData;
+                $newEntry['id'] = Str::uuid()->toString();
+                $newEntry['timestamp'] = now()->toIso8601String();
+                $newEntry['change_type'] = 'device';
+                
+                $historyData[] = $newEntry;
+                event(new ReportUpdated($newEntry, 'device'));
+                $this->info('Perubahan signifikan terdeteksi pada device, ID: ' . $newEntry['id']);
+                $changesMade = true;
+            }
+            
+            // Jika ada perubahan yang disimpan, update file
+            if ($changesMade) {
                 Storage::put('reports.json', json_encode($historyData, JSON_PRETTY_PRINT));
-                $this->info('Data baru tersimpan dengan ID: ' . $newData['id']);
-
-                // Broadcast event untuk realtime update
-                event(new ReportUpdated($newData));
-
-                if (isset($securityChanged) && $securityChanged) {
-                    $this->info('Perubahan terdeteksi pada security');
-                }
-                if (isset($smartcabChanged) && $smartcabChanged) {
-                    $this->info('Perubahan terdeteksi pada smartcab');
-                }
-                if (isset($controlChanged) && $controlChanged) {
-                    $this->info('Perubahan terdeteksi pada control');
-                }
-                if (isset($logsChanged) && $logsChanged) {
-                    $this->info('Perubahan terdeteksi pada logs');
-                }
+                $this->info('Semua perubahan berhasil disimpan.');
             } else {
-                $this->info('Tidak ada perubahan pada data, data tidak disimpan');
+                $this->info('Tidak ada perubahan signifikan pada data, data tidak disimpan');
             }
 
         } catch (\Exception $e) {
@@ -109,5 +185,97 @@ class FetchFirebaseData extends Command
         $newJson = json_encode($newData);
 
         return $oldJson !== $newJson;
+    }
+
+    /**
+     * Memeriksa perubahan pada data dht11 selain humidity dan temperature
+     */
+    private function hasNonTrivialDHT11Changes($oldData, $newData)
+    {
+        // Buat salinan data untuk perbandingan
+        $oldDataCompare = is_array($oldData) ? $oldData : [];
+        $newDataCompare = is_array($newData) ? $newData : [];
+        
+        // Hapus field yang sering berubah
+        if (isset($oldDataCompare['humidity'])) {
+            unset($oldDataCompare['humidity']);
+        }
+        if (isset($oldDataCompare['temperature'])) {
+            unset($oldDataCompare['temperature']);
+        }
+        if (isset($newDataCompare['humidity'])) {
+            unset($newDataCompare['humidity']);
+        }
+        if (isset($newDataCompare['temperature'])) {
+            unset($newDataCompare['temperature']);
+        }
+        
+        // Bandingkan data yang tersisa
+        return json_encode($oldDataCompare) !== json_encode($newDataCompare);
+    }
+    
+    /**
+     * Memeriksa apakah DHT11 data memiliki field selain yang dikecualikan
+     */
+    private function hasNonTrivialDHT11Data($data)
+    {
+        $dataCopy = is_array($data) ? $data : [];
+        
+        // Hapus field yang sering berubah
+        if (isset($dataCopy['humidity'])) {
+            unset($dataCopy['humidity']);
+        }
+        if (isset($dataCopy['temperature'])) {
+            unset($dataCopy['temperature']);
+        }
+        
+        // Periksa apakah masih ada data lain
+        return !empty($dataCopy);
+    }
+    
+    /**
+     * Memeriksa perubahan pada data device selain lastActive dan lastActiveWemos
+     */
+    private function hasNonTrivialDeviceChanges($oldData, $newData)
+    {
+        // Buat salinan data untuk perbandingan
+        $oldDataCompare = is_array($oldData) ? $oldData : [];
+        $newDataCompare = is_array($newData) ? $newData : [];
+        
+        // Hapus field yang sering berubah
+        if (isset($oldDataCompare['lastActive'])) {
+            unset($oldDataCompare['lastActive']);
+        }
+        if (isset($oldDataCompare['lastActiveWemos'])) {
+            unset($oldDataCompare['lastActiveWemos']);
+        }
+        if (isset($newDataCompare['lastActive'])) {
+            unset($newDataCompare['lastActive']);
+        }
+        if (isset($newDataCompare['lastActiveWemos'])) {
+            unset($newDataCompare['lastActiveWemos']);
+        }
+        
+        // Bandingkan data yang tersisa
+        return json_encode($oldDataCompare) !== json_encode($newDataCompare);
+    }
+    
+    /**
+     * Memeriksa apakah Device data memiliki field selain yang dikecualikan
+     */
+    private function hasNonTrivialDeviceData($data)
+    {
+        $dataCopy = is_array($data) ? $data : [];
+        
+        // Hapus field yang sering berubah
+        if (isset($dataCopy['lastActive'])) {
+            unset($dataCopy['lastActive']);
+        }
+        if (isset($dataCopy['lastActiveWemos'])) {
+            unset($dataCopy['lastActiveWemos']);
+        }
+        
+        // Periksa apakah masih ada data lain
+        return !empty($dataCopy);
     }
 }

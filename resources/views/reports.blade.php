@@ -29,6 +29,27 @@
             50% { background-color: #d1ecf1; }
             100% { background-color: #fff; }
         }
+        /* Styling untuk multiple select */
+        select[multiple] {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        select[multiple] optgroup {
+            font-weight: 600;
+            color: #374151;
+            padding: 0.25rem 0;
+        }
+        
+        select[multiple] option {
+            padding: 0.25rem 0.5rem;
+            margin: 0.125rem 0;
+        }
+        
+        select[multiple] option:checked {
+            background-color: #2563eb;
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -57,43 +78,59 @@
                 <ul class="space-y-2 text-sm">
                     <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
-                        <span><strong>Keamanan Normal:</strong> Sistem keamanan berjalan dengan baik</span>
+                        <span><strong>Fan:</strong> Perubahan pada status kipas</span>
                     </li>
                     <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
-                        <span><strong>Status Bahaya:</strong> Sistem keamanan mendeteksi potensi bahaya</span>
+                        <span><strong>Status:</strong> Perubahan status keamanan (aman/bahaya)</span>
                     </li>
                     <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></span>
-                        <span><strong>Gerakan Terdeteksi:</strong> Sensor gerakan mendeteksi aktivitas</span>
-                    </li>
-                    <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-lime-500 mr-2"></span>
-                        <span><strong>Tidak Ada Gerakan:</strong> Tidak ada gerakan yang terdeteksi</span>
-                    </li>
-                    <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-                        <span><strong>Servo Terkunci:</strong> Servo dalam keadaan terkunci</span>
+                        <span><strong>Motion:</strong> Perubahan status gerakan</span>
                     </li>
                     <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-cyan-500 mr-2"></span>
-                        <span><strong>Servo Terbuka:</strong> Servo dalam keadaan terbuka</span>
+                        <span><strong>Servo Status:</strong> Perubahan status servo (terbuka/terkunci)</span>
                     </li>
                     <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-violet-400 mr-2"></span>
-                        <span><strong>Akses Terakhir:</strong> Perubahan pada akses terakhir</span>
-                    </li>
-                    <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
-                        <span><strong>Kontrol Diubah:</strong> Terjadi perubahan pada kontrol perangkat</span>
-                    </li>
-                    <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-pink-500 mr-2"></span>
-                        <span><strong>Status Perangkat:</strong> Perubahan pada status perangkat</span>
+                        <span><strong>Last Access:</strong> Perubahan pada akses terakhir</span>
                     </li>
                     <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
-                        <span><strong>Error/Warning:</strong> Terdapat kesalahan atau peringatan dalam sistem</span>
+                        <span><strong>Restart ESP:</strong> Perangkat ESP direstart</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-amber-500 mr-2"></span>
+                        <span><strong>Restart Wemos:</strong> Perangkat Wemos direstart</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-indigo-500 mr-2"></span>
+                        <span><strong>RFID:</strong> Perubahan pada status RFID</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-lime-500 mr-2"></span>
+                        <span><strong>DHT:</strong> Perubahan pada sensor DHT</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-teal-500 mr-2"></span>
+                        <span><strong>MPU:</strong> Perubahan pada sensor MPU</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-sky-500 mr-2"></span>
+                        <span><strong>Servo Log:</strong> Perubahan pada log servo</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 mr-2"></span>
+                        <span><strong>System ESP:</strong> Perubahan status sistem ESP</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-pink-500 mr-2"></span>
+                        <span><strong>System Wemos:</strong> Perubahan status sistem Wemos</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="w-3 h-3 rounded-full bg-gray-500 mr-2"></span>
+                        <span><strong>Device Status:</strong> Perubahan status perangkat lainnya</span>
                     </li>
                 </ul>
             </div>
@@ -167,6 +204,38 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Tambahkan ini di dalam form filter, setelah Time Range Picker -->
+                <div class="md:col-span-2">
+                    <label for="categories" class="block mb-2 text-sm font-medium text-gray-700">Filter Kategori</label>
+                    <select id="categories" data-te-select-init multiple 
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <optgroup label="Keamanan">
+                            <option value="motion">Motion</option>
+                            <option value="status">Status Keamanan</option>
+                            <option value="fan">Fan</option>
+                        </optgroup>
+                        <optgroup label="Perangkat">
+                            <option value="servo-status">Servo Status</option>
+                            <option value="last-access">Last Access</option>
+                            <option value="device">Device Status</option>
+                        </optgroup>
+                        <optgroup label="Kontrol">
+                            <option value="restart-esp">Restart ESP</option>
+                            <option value="restart-wemos">Restart Wemos</option>
+                        </optgroup>
+                        <optgroup label="Sensor">
+                            <option value="rfid">RFID</option>
+                            <option value="dht">DHT</option>
+                            <option value="mpu">MPU</option>
+                        </optgroup>
+                        <optgroup label="Log">
+                            <option value="servo-log">Servo Log</option>
+                            <option value="system-esp">System ESP</option>
+                            <option value="system-wemos">System Wemos</option>
+                        </optgroup>
+                    </select>
                 </div>
                 
                 <div class="md:col-span-2 flex justify-end space-x-2">
@@ -287,6 +356,7 @@
         const pageSize = 10; // Jumlah item per halaman
         let filteredReports = []; // Menyimpan hasil filter
         let isFilterActive = false; // Flag untuk menandai apakah filter aktif
+        let selectedCategories = [];
         
         // Variabel untuk menyimpan instance chart
         let systemOverviewChart = null;
@@ -367,89 +437,84 @@
         function applyFilters() {
             const filterDate = document.getElementById('filterDate').value;
             const timeFilterEnabled = document.getElementById('filterTimeToggle').checked;
-            
-            // Simpan halaman sebelumnya
-            const prevPage = currentPage;
+            const categories = Array.from(document.getElementById('categories').selectedOptions).map(opt => opt.value);
             
             // Set flag filter aktif
-            isFilterActive = filterDate || timeFilterEnabled;
+            isFilterActive = filterDate || timeFilterEnabled || categories.length > 0;
+            selectedCategories = categories;
             
-            let startTime = null;
-            let endTime = null;
+            let filteredData = allReports;
             
-            if (timeFilterEnabled) {
-                startTime = document.getElementById('startTime').value;
-                endTime = document.getElementById('endTime').value;
-                
-                // Convert to minutes for easier comparison
-                const [startHour, startMinute] = startTime.split(':').map(Number);
-                const [endHour, endMinute] = endTime.split(':').map(Number);
-                
-                const startTotalMinutes = startHour * 60 + startMinute;
-                const endTotalMinutes = endHour * 60 + endMinute;
-                
-                // Filter data berdasarkan kriteria
-                filteredReports = allReports.filter(report => {
+            // Filter berdasarkan tanggal dan waktu
+            if (filterDate || timeFilterEnabled) {
+                filteredData = filteredData.filter(report => {
                     const reportDate = new Date(report.timestamp);
                     
-                    // Filter berdasarkan tanggal
+                    // Filter tanggal
                     if (filterDate) {
                         const dateStr = reportDate.toISOString().split('T')[0];
                         if (dateStr !== filterDate) return false;
                     }
                     
-                    // Filter berdasarkan rentang waktu
+                    // Filter waktu
                     if (timeFilterEnabled) {
+                        const startTime = document.getElementById('startTime').value;
+                        const endTime = document.getElementById('endTime').value;
+                        const [startHour, startMinute] = startTime.split(':').map(Number);
+                        const [endHour, endMinute] = endTime.split(':').map(Number);
+                        
+                        const startTotalMinutes = startHour * 60 + startMinute;
+                        const endTotalMinutes = endHour * 60 + endMinute;
+                        
                         const hour = reportDate.getHours();
                         const minute = reportDate.getMinutes();
                         const totalMinutes = hour * 60 + minute;
                         
-                        // Handle case where time range crosses midnight
                         if (startTotalMinutes <= endTotalMinutes) {
-                            // Normal case (e.g., 08:00 to 17:00)
                             if (totalMinutes < startTotalMinutes || totalMinutes > endTotalMinutes) return false;
                         } else {
-                            // Overnight case (e.g., 22:00 to 06:00)
                             if (totalMinutes < startTotalMinutes && totalMinutes > endTotalMinutes) return false;
                         }
                     }
                     
                     return true;
                 });
-            } else {
-                // Jika filter waktu tidak aktif, hanya filter berdasarkan tanggal
-                filteredReports = allReports.filter(report => {
-                    const reportDate = new Date(report.timestamp);
-                    
-                    // Filter berdasarkan tanggal
-                    if (filterDate) {
-                        const dateStr = reportDate.toISOString().split('T')[0];
-                        if (dateStr !== filterDate) return false;
-                    }
-                    
-                    return true;
+            }
+            
+            // Filter berdasarkan kategori
+            if (categories.length > 0) {
+                filteredData = filteredData.filter(report => {
+                    // Deteksi perubahan untuk report ini
+                    const changes = detectChanges(report, allReports, allReports.indexOf(report));
+                    // Cek apakah ada perubahan yang masuk dalam kategori yang dipilih
+                    return changes.some(change => categories.includes(change.badge));
                 });
             }
             
-            // Reset halaman ke 1 HANYA ketika menerapkan filter baru (karena ini eksplisit pengguna memfilter)
+            // Update data terfilter
+            filteredReports = filteredData;
+            
+            // Reset ke halaman pertama
             currentPage = 1;
             
-            // PENTING: Update chart dengan data yang sudah difilter
+            // Update chart
             renderSystemOverviewChart(filteredReports);
             
-            // Render data yang telah difilter
+            // Render data
             renderPaginatedReports(true);
             
             // Tampilkan notifikasi hasil filter
             const filterCount = filteredReports.length;
             const totalCount = allReports.length;
-            if (filterCount === 0) {
-                showFilterNotification(`Tidak ada data yang cocok dengan filter`);
-            } else {
-                showFilterNotification(`Ditemukan ${filterCount} dari ${totalCount} data`);
+            
+            let filterMessage = `Ditemukan ${filterCount} dari ${totalCount} data`;
+            if (categories.length > 0) {
+                filterMessage += ` dengan kategori: ${categories.join(', ')}`;
             }
             
-            // Tambahkan badge untuk menampilkan status filter pada chart
+            showFilterNotification(filterCount === 0 ? 'Tidak ada data yang cocok dengan filter' : filterMessage);
+            
+            // Update status filter pada chart
             updateChartFilterStatus();
         }
         
@@ -481,6 +546,8 @@
             document.getElementById('filterTimeToggle').checked = false;
             document.getElementById('timeRangePicker').classList.add('hidden');
             document.getElementById('timeToggleStatus').textContent = 'Semua Waktu';
+            document.getElementById('categories').selectedIndex = -1; // Reset multiple select
+            selectedCategories = [];
             
             // Reset flag filter
             isFilterActive = false;
@@ -489,7 +556,7 @@
             filteredReports = allReports;
             currentPage = 1;
             
-            // PENTING: Update chart dengan semua data
+            // Update chart dengan semua data
             renderSystemOverviewChart(allReports);
             
             // Update chart filter status
@@ -745,15 +812,25 @@
                 const changes = detectChanges(report, allReports, allReports.indexOf(report));
                 changes.forEach(change => {
                     const badge = document.createElement('span');
-                    // Flowbite badge styles
+                    
+                    // Flowbite badge styles dengan warna khusus untuk setiap jenis
                     const badgeClasses = {
                         'primary': 'bg-blue-100 text-blue-800',
-                        'secondary': 'bg-gray-100 text-gray-800',
-                        'danger': 'bg-red-100 text-red-800',
-                        'warning': 'bg-yellow-100 text-yellow-800',
-                        'info': 'bg-indigo-100 text-indigo-800',
-                        'light': 'bg-gray-100 text-gray-800',
-                        'dark': 'bg-gray-700 text-gray-300'
+                        'motion': 'bg-yellow-100 text-yellow-800',
+                        'status': 'bg-red-100 text-red-800', 
+                        'fan': 'bg-green-100 text-green-800',
+                        'last-access': 'bg-violet-100 text-violet-800',
+                        'servo-status': 'bg-cyan-100 text-cyan-800',
+                        'restart-esp': 'bg-orange-100 text-orange-800',
+                        'restart-wemos': 'bg-amber-100 text-amber-800',
+                        'rfid': 'bg-indigo-100 text-indigo-800',
+                        'dht': 'bg-lime-100 text-lime-800',
+                        'mpu': 'bg-teal-100 text-teal-800',
+                        'servo-log': 'bg-sky-100 text-sky-800',
+                        'system-esp': 'bg-rose-100 text-rose-800',
+                        'system-wemos': 'bg-pink-100 text-pink-800',
+                        'device': 'bg-gray-100 text-gray-800',
+                        'light': 'bg-gray-100 text-gray-400'
                     };
                     
                     badge.className = `px-2 py-0.5 rounded text-xs font-medium me-2 ${badgeClasses[change.badge] || badgeClasses['light']}`;
@@ -810,41 +887,81 @@
             // Security changes
             if (report.security && prevReport.security) {
                 if (report.security.motion !== prevReport.security.motion) {
-                    changes.push({ type: 'Gerakan', badge: 'danger' });
+                    changes.push({ type: 'Motion', badge: 'motion' });
                 }
                 
                 if (report.security.status !== prevReport.security.status) {
-                    changes.push({ type: 'Status Keamanan', badge: 'danger' });
+                    changes.push({ type: 'Status', badge: 'status' });
+                }
+                
+                if (report.security.fan !== prevReport.security.fan) {
+                    changes.push({ type: 'Fan', badge: 'fan' });
                 }
             }
             
             // Smartcab changes
             if (report.smartcab && prevReport.smartcab) {
                 if (report.smartcab.last_access !== prevReport.smartcab.last_access) {
-                    changes.push({ type: 'Akses Terakhir', badge: 'info' });
+                    changes.push({ type: 'Last Access', badge: 'last-access' });
                 }
                 
                 if (report.smartcab.servo_status !== prevReport.smartcab.servo_status) {
-                    changes.push({ type: 'Status Servo', badge: 'warning' });
+                    changes.push({ type: 'Servo Status', badge: 'servo-status' });
                 }
             }
             
             // Control changes
-            if (report.control && prevReport.control && 
-                JSON.stringify(report.control) !== JSON.stringify(prevReport.control)) {
-                changes.push({ type: 'Kontrol Perangkat', badge: 'secondary' });
-            }
-            
-            // Device changes
-            if (report.device && prevReport.device && 
-                JSON.stringify(report.device) !== JSON.stringify(prevReport.device)) {
-                changes.push({ type: 'Status Perangkat', badge: 'secondary' });
+            if (report.control && prevReport.control) {
+                if (report.control.restartESP !== prevReport.control.restartESP) {
+                    changes.push({ type: 'Restart ESP', badge: 'restart-esp' });
+                }
+                
+                if (report.control.restartWemos !== prevReport.control.restartWemos) {
+                    changes.push({ type: 'Restart Wemos', badge: 'restart-wemos' });
+                }
             }
             
             // Logs changes
-            if (report.logs && prevReport.logs && 
-                JSON.stringify(report.logs) !== JSON.stringify(prevReport.logs)) {
-                changes.push({ type: 'Log Sistem', badge: 'dark' });
+            if (report.logs && prevReport.logs) {
+                // RFID logs
+                if (report.logs.RFID && prevReport.logs.RFID && 
+                    JSON.stringify(report.logs.RFID) !== JSON.stringify(prevReport.logs.RFID)) {
+                    changes.push({ type: 'RFID', badge: 'rfid' });
+                }
+                
+                // DHT logs
+                if (report.logs.dht && prevReport.logs.dht && 
+                    JSON.stringify(report.logs.dht) !== JSON.stringify(prevReport.logs.dht)) {
+                    changes.push({ type: 'DHT', badge: 'dht' });
+                }
+                
+                // MPU logs
+                if (report.logs.mpu && prevReport.logs.mpu && 
+                    JSON.stringify(report.logs.mpu) !== JSON.stringify(prevReport.logs.mpu)) {
+                    changes.push({ type: 'MPU', badge: 'mpu' });
+                }
+                
+                // Servo logs
+                if (report.logs.servo && prevReport.logs.servo && 
+                    JSON.stringify(report.logs.servo) !== JSON.stringify(prevReport.logs.servo)) {
+                    changes.push({ type: 'Servo Log', badge: 'servo-log' });
+                }
+                
+                // System ESP logs
+                if (report.logs.systemESP !== prevReport.logs.systemESP) {
+                    changes.push({ type: 'System ESP', badge: 'system-esp' });
+                }
+                
+                // System Wemos logs
+                if (report.logs.systemWemos !== prevReport.logs.systemWemos) {
+                    changes.push({ type: 'System Wemos', badge: 'system-wemos' });
+                }
+            }
+            
+            // Device changes - general fallback if needed
+            if (report.device && prevReport.device && 
+                JSON.stringify(report.device) !== JSON.stringify(prevReport.device)) {
+                changes.push({ type: 'Device Status', badge: 'device' });
             }
             
             if (changes.length === 0) {
@@ -1039,145 +1156,186 @@
         function analyzeSystemOverview(reports) {
             // Siapkan variabel untuk menyimpan hitungan status
             const statusCounts = {
-                'securityNormal': 0,      // Status keamanan normal
-                'securityDanger': 0,      // Status keamanan bahaya
-                'motionDetected': 0,      // Gerakan terdeteksi
-                'motionNotDetected': 0,   // Gerakan tidak terdeteksi
-                'servoLocked': 0,         // Servo terkunci
-                'servoUnlocked': 0,       // Servo terbuka
-                'accessChanged': 0,       // Perubahan akses terakhir
-                'controlChanged': 0,      // Perubahan kontrol perangkat
-                'deviceChanged': 0,       // Perubahan status perangkat
-                'logError': 0             // Log error
+                'motion': 0,          // Motion status
+                'status': 0,          // Security status
+                'fan': 0,             // Fan status
+                'servoStatus': 0,     // Servo status
+                'lastAccess': 0,      // Last access
+                'restartEsp': 0,      // Restart ESP
+                'restartWemos': 0,    // Restart Wemos
+                'rfid': 0,            // RFID
+                'dht': 0,             // DHT sensor
+                'mpu': 0,             // MPU sensor
+                'servoLog': 0,        // Servo log
+                'systemEsp': 0,       // System ESP
+                'systemWemos': 0,     // System Wemos
+                'deviceStatus': 0     // Device status
             };
             
-            // Total untuk persentase dan statusCounts
+            // Total untuk persentase
             let totalCounts = 0;
             
+            // Fungsi untuk menghitung perubahan antar report
+            function countChanges(report, index) {
+                if (index === 0 || index >= reports.length - 1) return [];
+                
+                const changes = [];
+                const prevReport = reports[index + 1]; // Data baris sebelumnya (karena data sorted terbaru dulu)
+                
+                // Security changes
+                if (report.security && prevReport.security) {
+                    if (report.security.motion !== prevReport.security.motion) {
+                        changes.push('motion');
+                    }
+                    
+                    if (report.security.status !== prevReport.security.status) {
+                        changes.push('status');
+                    }
+                    
+                    if (report.security.fan !== prevReport.security.fan) {
+                        changes.push('fan');
+                    }
+                }
+                
+                // Smartcab changes
+                if (report.smartcab && prevReport.smartcab) {
+                    if (report.smartcab.last_access !== prevReport.smartcab.last_access) {
+                        changes.push('lastAccess');
+                    }
+                    
+                    if (report.smartcab.servo_status !== prevReport.smartcab.servo_status) {
+                        changes.push('servoStatus');
+                    }
+                }
+                
+                // Control changes
+                if (report.control && prevReport.control) {
+                    if (report.control.restartESP !== prevReport.control.restartESP) {
+                        changes.push('restartEsp');
+                    }
+                    
+                    if (report.control.restartWemos !== prevReport.control.restartWemos) {
+                        changes.push('restartWemos');
+                    }
+                }
+                
+                // Logs changes
+                if (report.logs && prevReport.logs) {
+                    // RFID logs
+                    if (report.logs.RFID && prevReport.logs.RFID && 
+                        JSON.stringify(report.logs.RFID) !== JSON.stringify(prevReport.logs.RFID)) {
+                        changes.push('rfid');
+                    }
+                    
+                    // DHT logs
+                    if (report.logs.dht && prevReport.logs.dht && 
+                        JSON.stringify(report.logs.dht) !== JSON.stringify(prevReport.logs.dht)) {
+                        changes.push('dht');
+                    }
+                    
+                    // MPU logs
+                    if (report.logs.mpu && prevReport.logs.mpu && 
+                        JSON.stringify(report.logs.mpu) !== JSON.stringify(prevReport.logs.mpu)) {
+                        changes.push('mpu');
+                    }
+                    
+                    // Servo logs
+                    if (report.logs.servo && prevReport.logs.servo && 
+                        JSON.stringify(report.logs.servo) !== JSON.stringify(prevReport.logs.servo)) {
+                        changes.push('servoLog');
+                    }
+                    
+                    // System ESP logs
+                    if (report.logs.systemESP !== prevReport.logs.systemESP) {
+                        changes.push('systemEsp');
+                    }
+                    
+                    // System Wemos logs
+                    if (report.logs.systemWemos !== prevReport.logs.systemWemos) {
+                        changes.push('systemWemos');
+                    }
+                }
+                
+                // Device changes - general fallback if needed
+                if (report.device && prevReport.device && 
+                    JSON.stringify(report.device) !== JSON.stringify(prevReport.device)) {
+                    changes.push('deviceStatus');
+                }
+                
+                return changes;
+            }
+            
             // Periksa setiap laporan untuk mengisi kategori
-            reports.forEach(report => {
-                let categoriesAdded = 0;
+            reports.forEach((report, index) => {
+                const changes = countChanges(report, index);
                 
-                // Cek status keamanan
-                if (report.security) {
-                    if (report.security.status) {
-                        if (report.security.status.toLowerCase() === 'bahaya') {
-                            statusCounts['securityDanger']++;
-                            categoriesAdded++;
-                        } else if (report.security.status.toLowerCase() === 'aman') {
-                            statusCounts['securityNormal']++;
-                            categoriesAdded++;
-                        }
-                    }
-                    
-                    if (report.security.motion) {
-                        if (report.security.motion.toLowerCase() === 'detected') {
-                            statusCounts['motionDetected']++;
-                            categoriesAdded++;
-                        } else if (report.security.motion.toLowerCase() === 'not detected') {
-                            statusCounts['motionNotDetected']++;
-                            categoriesAdded++;
-                        }
-                    }
+                changes.forEach(change => {
+                    statusCounts[change]++;
+                    totalCounts++;
+                });
+                
+                // Jika tidak ada perubahan, tambahkan satu ke total untuk report ini
+                if (changes.length === 0 && index > 0 && index < reports.length - 1) {
+                    totalCounts++;
                 }
-                
-                // Cek status smartcab
-                if (report.smartcab) {
-                    if (report.smartcab.servo_status) {
-                    if (report.smartcab.servo_status.toLowerCase() === 'locked') {
-                        statusCounts['servoLocked']++;
-                            categoriesAdded++;
-                    } else if (report.smartcab.servo_status.toLowerCase() === 'unlocked') {
-                        statusCounts['servoUnlocked']++;
-                            categoriesAdded++;
-                        }
-                    }
-                    
-                    if (report.smartcab.last_access) {
-                        statusCounts['accessChanged']++;
-                        categoriesAdded++;
-                    }
-                }
-                
-                // Cek perubahan kontrol
-                if (report.control && Object.keys(report.control).length > 0) {
-                    statusCounts['controlChanged']++;
-                    categoriesAdded++;
-                }
-                
-                // Cek perubahan device
-                if (report.device && Object.keys(report.device).length > 0) {
-                    statusCounts['deviceChanged']++;
-                    categoriesAdded++;
-                }
-                
-                // Cek logs untuk error
-                if (report.logs) {
-                    let hasError = false;
-                    for (const logKey in report.logs) {
-                        if (report.logs[logKey] && report.logs[logKey].status) {
-                            const status = report.logs[logKey].status.toLowerCase();
-                            if (status.includes('error') || status.includes('warning')) {
-                                hasError = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (hasError) {
-                        statusCounts['logError']++;
-                        categoriesAdded++;
-                    }
-                }
-                
-                // Tambahkan jumlah kategori ke total
-                totalCounts += categoriesAdded > 0 ? categoriesAdded : 1;
             });
             
             // Update counter
             document.getElementById('system-chart-count').textContent = 
-                `Total: ${reports.length} laporan dengan ${totalCounts} status`;
+                `Total: ${reports.length} laporan dengan ${totalCounts} perubahan status`;
             
             // Kembalikan array untuk chart dengan hanya nilai yang bukan nol
             const resultData = [
-                statusCounts['securityNormal'],
-                statusCounts['securityDanger'], 
-                statusCounts['motionDetected'],
-                statusCounts['motionNotDetected'],
-                statusCounts['servoLocked'],
-                statusCounts['servoUnlocked'],
-                statusCounts['accessChanged'],
-                statusCounts['controlChanged'],
-                statusCounts['deviceChanged'],
-                statusCounts['logError']
+                statusCounts['fan'],
+                statusCounts['status'],
+                statusCounts['motion'],
+                statusCounts['servoStatus'],
+                statusCounts['lastAccess'],
+                statusCounts['restartEsp'],
+                statusCounts['restartWemos'],
+                statusCounts['rfid'],
+                statusCounts['dht'],
+                statusCounts['mpu'],
+                statusCounts['servoLog'],
+                statusCounts['systemEsp'],
+                statusCounts['systemWemos'],
+                statusCounts['deviceStatus']
             ];
             
             // Label yang sesuai dengan resultData
             const resultLabels = [
-                    'Keamanan Normal', 
-                    'Status Bahaya', 
-                    'Gerakan Terdeteksi', 
-                    'Tidak Ada Gerakan', 
-                    'Servo Terkunci', 
-                    'Servo Terbuka', 
-                'Akses Terakhir', 
-                'Kontrol Diubah',
-                'Status Perangkat',
-                'Error/Warning'
+                'Fan',
+                'Status Keamanan',
+                'Motion',
+                'Servo Status',
+                'Last Access',
+                'Restart ESP',
+                'Restart Wemos',
+                'RFID',
+                'DHT',
+                'MPU',
+                'Servo Log',
+                'System ESP',
+                'System Wemos',
+                'Device Status'
             ];
             
-            // Warna yang sesuai dengan resultData
+            // Warna yang sesuai dengan resultData (sesuai dengan badge colors)
             const resultColors = [
-                '#22c55e', // Keamanan Normal (Hijau)
-                '#ef4444', // Status Bahaya (Merah)
-                '#eab308', // Gerakan Terdeteksi (Kuning)
-                '#84cc16', // Tidak Ada Gerakan (Hijau Muda)
-                '#3b82f6', // Servo Terkunci (Biru)
-                '#06b6d4', // Servo Terbuka (Cyan)
-                '#8b5cf6', // Akses Terakhir (Ungu Muda)
-                '#a855f7', // Kontrol Diubah (Ungu)
-                '#ec4899', // Status Perangkat (Pink)
-                '#f97316'  // Error/Warning (Oranye)
+                '#22c55e', // Fan (Hijau)
+                '#ef4444', // Status (Merah)
+                '#eab308', // Motion (Kuning)
+                '#06b6d4', // Servo Status (Cyan)
+                '#8b5cf6', // Last Access (Ungu Muda)
+                '#f97316', // Restart ESP (Oranye)
+                '#f59e0b', // Restart Wemos (Amber)
+                '#6366f1', // RFID (Indigo)
+                '#84cc16', // DHT (Lime)
+                '#14b8a6', // MPU (Teal)
+                '#0ea5e9', // Servo Log (Sky)
+                '#e11d48', // System ESP (Rose)
+                '#ec4899', // System Wemos (Pink)
+                '#6b7280'  // Device Status (Gray)
             ];
             
             // Filter untuk menghilangkan kategori dengan nilai nol
@@ -1298,32 +1456,36 @@
             const filterDate = document.getElementById('filterDate').value;
             const timeFilterEnabled = document.getElementById('filterTimeToggle').checked;
             
-            let filterInfo = '';
+            let filterInfo = [];
+            
             if (filterDate) {
                 const formattedDate = new Date(filterDate).toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric'
                 });
-                filterInfo += `Tanggal: ${formattedDate}`;
+                filterInfo.push(`Tanggal: ${formattedDate}`);
             }
             
             if (timeFilterEnabled) {
                 const startTime = document.getElementById('startTime').value;
                 const endTime = document.getElementById('endTime').value;
-                if (filterInfo) filterInfo += ' | ';
-                filterInfo += `Waktu: ${startTime} - ${endTime}`;
+                filterInfo.push(`Waktu: ${startTime} - ${endTime}`);
+            }
+            
+            if (selectedCategories.length > 0) {
+                filterInfo.push(`Kategori: ${selectedCategories.join(', ')}`);
             }
             
             // Update text pada chart count
-            if (filterInfo) {
+            if (filterInfo.length > 0) {
                 chartCountElement.innerHTML = `
                     <span class="font-medium">Data Terfilter:</span> ${filteredReports.length} dari ${allReports.length}
                 `;
                 
                 // Tampilkan badge filter
                 chartFilterBadge.classList.remove('hidden');
-                chartFilterText.textContent = filterInfo;
+                chartFilterText.textContent = filterInfo.join(' | ');
             } else {
                 chartCountElement.textContent = `Total: ${allReports.length} laporan dengan ${analyzeSystemOverview(allReports).series.reduce((a, b) => a + b, 0)} status`;
                 
