@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\FirebaseAuthController;
 use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\ExportReportController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportExportController;
 
 Route::get('/login', [FirebaseAuthController::class, 'showLogin'])
     ->name('login')
@@ -36,3 +38,4 @@ Route::get('/', function () {
 Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
 Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+Route::get('/export-reports', [ExportReportController::class, 'exportPdf']);
