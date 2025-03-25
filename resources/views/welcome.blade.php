@@ -281,7 +281,7 @@
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">DHT 11</p>
-                                <p class="text-sm sm:text-lg font-semibold {{ $dhtStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $dhtStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                                <p class="dht-status text-sm sm:text-lg font-semibold {{ $dhtStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $dhtStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
                             </div>
                         </div>
 
@@ -292,7 +292,7 @@
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">MPU 6050</p>
-                                <p class="text-sm sm:text-lg font-semibold {{ $mpuStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $mpuStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                                <p class="mpu-status text-sm sm:text-lg font-semibold {{ $mpuStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $mpuStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
                             </div>
                         </div>
 
@@ -303,7 +303,7 @@
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Servo MG996r</p>
-                                <p class="text-sm sm:text-lg font-semibold {{ $servoStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $servoStatus }}</p>
+                                <p class="servo-status text-sm sm:text-lg font-semibold {{ $servoStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $servoStatus }}</p>
                             </div>
                         </div>
 
@@ -314,7 +314,7 @@
                             </div>
                             <div>
                                 <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">RFID Reader</p>
-                                <p class="text-sm sm:text-lg font-semibold {{ $rfidStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $rfidStatus }}</p>
+                                <p class="rfid-status text-sm sm:text-lg font-semibold {{ $rfidStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $rfidStatus }}</p>
                             </div>
                         </div>
                     </div>
@@ -344,7 +344,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">DHT 11</p>
-                                    <p class="text-sm sm:text-lg font-semibold {{ $dhtStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $dhtStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                                    <p class="dht-status text-sm sm:text-lg font-semibold {{ $dhtStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $dhtStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
                                 </div>
                             </div>
 
@@ -355,7 +355,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">MPU 6050</p>
-                                    <p class="text-sm sm:text-lg font-semibold {{ $mpuStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $mpuStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
+                                    <p class="mpu-status text-sm sm:text-lg font-semibold {{ $mpuStatus == 'connected' ? 'text-green-500' : 'text-red-500' }}">{{ $mpuStatus == 'connected' ? 'Connected' : 'Disconnected' }}</p>
                                 </div>
                             </div>
 
@@ -366,7 +366,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Servo MG996r</p>
-                                    <p class="text-sm sm:text-lg font-semibold {{ $servoStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $servoStatus }}</p>
+                                    <p class="servo-status text-sm sm:text-lg font-semibold {{ $servoStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $servoStatus }}</p>
                                 </div>
                             </div>
 
@@ -377,7 +377,7 @@
                                 </div>
                                 <div>
                                     <p class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">RFID Reader</p>
-                                    <p class="text-sm sm:text-lg font-semibold {{ $rfidStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $rfidStatus }}</p>
+                                    <p class="rfid-status text-sm sm:text-lg font-semibold {{ $rfidStatus == 'Connected' ? 'text-green-500' : 'text-red-500' }}">{{ $rfidStatus }}</p>
                                 </div>
                             </div>
                         </div>
@@ -388,7 +388,7 @@
                         <div class="flex items-center mb-6">
                             <div class="p-3 sm:p-4 mr-3 sm:mr-4 bg-green-100 rounded-full">
                                 <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                                 </svg>
                             </div>
                             <div>
@@ -975,6 +975,78 @@
                 console.error('Error getting motion status:', error);
             });
             
+            // TAMBAHAN: Listener untuk status sensor DHT11
+            database.ref('sensors/dht11').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('DHT11 status received:', status);
+                
+                const isConnected = status === 'connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                // Update status DHT11 di semua elemen yang sesuai
+                document.querySelectorAll('.dht-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `dht-status ${statusClass}`;
+                });
+            }, (error) => {
+                console.error('Error getting DHT11 status:', error);
+            });
+            
+            // TAMBAHAN: Listener untuk status sensor MPU6050
+            database.ref('sensors/mpu6050').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('MPU6050 status received:', status);
+                
+                const isConnected = status === 'connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                // Update status MPU6050 di semua elemen yang sesuai
+                document.querySelectorAll('.mpu-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `mpu-status ${statusClass}`;
+                });
+            }, (error) => {
+                console.error('Error getting MPU6050 status:', error);
+            });
+            
+            // TAMBAHAN: Listener untuk status Servo
+            database.ref('sensors/servo').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Servo status received:', status);
+                
+                const isConnected = status === 'Connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                // Update status Servo di semua elemen yang sesuai
+                document.querySelectorAll('.servo-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `servo-status ${statusClass}`;
+                });
+            }, (error) => {
+                console.error('Error getting Servo status:', error);
+            });
+            
+            // TAMBAHAN: Listener untuk status RFID
+            database.ref('sensors/rfid').on('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('RFID status received:', status);
+                
+                const isConnected = status === 'Connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                // Update status RFID di semua elemen yang sesuai
+                document.querySelectorAll('.rfid-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `rfid-status ${statusClass}`;
+                });
+            }, (error) => {
+                console.error('Error getting RFID status:', error);
+            });
+            
             console.log('All listeners setup complete with new approach');
         }
 
@@ -1205,6 +1277,63 @@
                 document.querySelectorAll('#wemos-status').forEach(el => {
                     el.textContent = statusText;
                     el.className = statusClass;
+                });
+            });
+            
+            // PERBAIKAN: Update status sensor dengan path yang benar
+            database.ref('logs/dht/status').once('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Forcing refresh of DHT11 status:', status);
+                
+                const isConnected = status === 'connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                document.querySelectorAll('.dht-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `dht-status ${statusClass}`;
+                });
+            });
+            
+            database.ref('logs/mpu/status').once('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Forcing refresh of MPU6050 status:', status);
+                
+                const isConnected = status === 'connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                document.querySelectorAll('.mpu-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `mpu-status ${statusClass}`;
+                });
+            });
+            
+            database.ref('logs/servo/status').once('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Forcing refresh of Servo status:', status);
+                
+                const isConnected = status === 'Connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                document.querySelectorAll('.servo-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `servo-status ${statusClass}`;
+                });
+            });
+            
+            database.ref('logs/RFID/status').once('value', (snapshot) => {
+                const status = snapshot.val();
+                console.log('Forcing refresh of RFID status:', status);
+                
+                const isConnected = status === 'Connected';
+                const statusText = isConnected ? 'Connected' : 'Disconnected';
+                const statusClass = `text-sm sm:text-lg font-semibold ${isConnected ? 'text-green-500' : 'text-red-500'}`;
+                
+                document.querySelectorAll('.rfid-status').forEach(el => {
+                    el.textContent = statusText;
+                    el.className = `rfid-status ${statusClass}`;
                 });
             });
         }

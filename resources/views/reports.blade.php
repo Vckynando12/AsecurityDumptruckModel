@@ -128,10 +128,10 @@
                         <span class="w-3 h-3 rounded-full bg-pink-500 mr-2"></span>
                         <span><strong>System Wemos:</strong> Perubahan status sistem Wemos</span>
                     </li>
-                    <li class="flex items-center">
+                    {{-- <li class="flex items-center">
                         <span class="w-3 h-3 rounded-full bg-gray-500 mr-2"></span>
                         <span><strong>Device Status:</strong> Perubahan status perangkat lainnya</span>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
         </div>
@@ -157,7 +157,7 @@
                     <div class="relative">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                                <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2.586a1 1 0 0 0 .293.707l-6.414 6.414a1 1 0 0 1-.293.707V17l-4 4v-6.586a1 1 0 0 1-.293-.707L3.293 7.293A1 1 0 0 0 3 6.586V4z"></path>
                             </svg>
                         </div>
                         <input type="date" id="filterDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5">
@@ -815,7 +815,6 @@
                     
                     // Flowbite badge styles dengan warna khusus untuk setiap jenis
                     const badgeClasses = {
-                        'primary': 'bg-blue-100 text-blue-800',
                         'motion': 'bg-yellow-100 text-yellow-800',
                         'status': 'bg-red-100 text-red-800', 
                         'fan': 'bg-green-100 text-green-800',
@@ -959,14 +958,10 @@
             }
             
             // Device changes - general fallback if needed
-            if (report.device && prevReport.device && 
-                JSON.stringify(report.device) !== JSON.stringify(prevReport.device)) {
-                changes.push({ type: 'Device Status', badge: 'device' });
-            }
-            
-            if (changes.length === 0) {
-                changes.push({ type: 'Tidak ada perubahan', badge: 'light' });
-            }
+            // if (report.device && prevReport.device && 
+            //     JSON.stringify(report.device) !== JSON.stringify(prevReport.device)) {
+            //     changes.push({ type: 'Device Status', badge: 'device' });
+            // }
             
             return changes;
         }
@@ -1018,7 +1013,7 @@
                             <li class="p-3 bg-gray-50 rounded-lg"><strong class="text-gray-700">Akses Terakhir:</strong> ${report.smartcab.last_access || 'N/A'}</li>
                             <li class="p-3 bg-gray-50 rounded-lg"><strong class="text-gray-700">Status Servo:</strong> ${report.smartcab.servo_status || 'N/A'}</li>
                             <li class="p-3 bg-gray-50 rounded-lg"><strong class="text-gray-700">Status Perangkat:</strong> ${report.smartcab.status_device || 'N/A'}</li>
-                    </ul>
+                        </ul>
                     </div>
                 `;
             }
@@ -1169,7 +1164,6 @@
                 'servoLog': 0,        // Servo log
                 'systemEsp': 0,       // System ESP
                 'systemWemos': 0,     // System Wemos
-                'deviceStatus': 0     // Device status
             };
             
             // Total untuk persentase
@@ -1256,12 +1250,6 @@
                     }
                 }
                 
-                // Device changes - general fallback if needed
-                if (report.device && prevReport.device && 
-                    JSON.stringify(report.device) !== JSON.stringify(prevReport.device)) {
-                    changes.push('deviceStatus');
-                }
-                
                 return changes;
             }
             
@@ -1273,11 +1261,6 @@
                     statusCounts[change]++;
                     totalCounts++;
                 });
-                
-                // Jika tidak ada perubahan, tambahkan satu ke total untuk report ini
-                if (changes.length === 0 && index > 0 && index < reports.length - 1) {
-                    totalCounts++;
-                }
             });
             
             // Update counter
@@ -1299,7 +1282,6 @@
                 statusCounts['servoLog'],
                 statusCounts['systemEsp'],
                 statusCounts['systemWemos'],
-                statusCounts['deviceStatus']
             ];
             
             // Label yang sesuai dengan resultData
@@ -1317,7 +1299,6 @@
                 'Servo Log',
                 'System ESP',
                 'System Wemos',
-                'Device Status'
             ];
             
             // Warna yang sesuai dengan resultData (sesuai dengan badge colors)
@@ -1334,8 +1315,7 @@
                 '#14b8a6', // MPU (Teal)
                 '#0ea5e9', // Servo Log (Sky)
                 '#e11d48', // System ESP (Rose)
-                '#ec4899', // System Wemos (Pink)
-                '#6b7280'  // Device Status (Gray)
+                '#ec4899' // System Wemos (Pink)
             ];
             
             // Filter untuk menghilangkan kategori dengan nilai nol
