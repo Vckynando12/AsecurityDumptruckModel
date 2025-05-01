@@ -53,7 +53,6 @@
     </style>
 </head>
 <body class="bg-gray-50">
-
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Laporan Keamanan dan Monitoring</h2>
@@ -214,37 +213,7 @@
                     </div>
                 </div>
                 
-                <!-- Tambahkan ini di dalam form filter, setelah Time Range Picker -->
-                <div class="md:col-span-2">
-                    <label for="categories" class="block mb-2 text-sm font-medium text-gray-700">Filter Kategori</label>
-                    <select id="categories" data-te-select-init multiple 
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <optgroup label="Keamanan">
-                            <option value="motion">Motion</option>
-                            <option value="status">Status Keamanan</option>
-                            <option value="fan">Fan</option>
-                        </optgroup>
-                        <optgroup label="Perangkat">
-                            <option value="servo-status">Servo Status</option>
-                            <option value="last-access">Last Access</option>
-                            <option value="device">Device Status</option>
-                        </optgroup>
-                        <optgroup label="Kontrol">
-                            <option value="restart-esp">Restart ESP</option>
-                            <option value="restart-wemos">Restart Wemos</option>
-                        </optgroup>
-                        <optgroup label="Sensor">
-                            <option value="rfid">RFID</option>
-                            <option value="dht">DHT</option>
-                            <option value="mpu">MPU</option>
-                        </optgroup>
-                        <optgroup label="Log">
-                            <option value="servo-log">Servo Log</option>
-                            <option value="system-esp">System ESP</option>
-                            <option value="system-wemos">System Wemos</option>
-                        </optgroup>
-                    </select>
-                </div>
+                <!-- Remove the categories filter section -->
                 
                 <div class="md:col-span-2 flex justify-end space-x-2">
                     <button type="button" id="applyFilter" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">

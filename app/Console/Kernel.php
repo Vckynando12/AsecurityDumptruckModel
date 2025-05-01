@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('firebase:fetch')->everyMinute();
+        $schedule->command('firebase:fetch')
+                 ->everySecond();
     }
     /**
      * Register the commands for the application.

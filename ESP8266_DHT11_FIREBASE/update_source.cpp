@@ -36,6 +36,10 @@ const unsigned long restartInterval = 6 * 60 * 60 * 1000; // Restart otomatis 6 
 unsigned long lastHeartbeatTime = 0;
 const unsigned long heartbeatInterval = 60000; // 60 detik = 1 menit
 
+// Tambahkan variabel untuk pengecekan koneksi WiFi
+unsigned long lastWiFiCheckTime = 0;
+const unsigned long wifiCheckInterval = 10000; // 10 detik
+
 void setup() {
     Serial.begin(115200);
     Wire.begin(D2, D1);  // SDA = D2, SCL = D1
@@ -105,29 +109,67 @@ void setup() {
 }
 
 void loop() {
+    // Periksa koneksi WiFi dan Firebase
+    if (millis() - lastWiFiCheckTime >= wifiCheckInterval) {
+        lastWiFiCheckTime = millis();
+        
+        // Cek koneksi WiFi
+        if (WiFi.status() != WL_CONNECTED) {
+            Serial.println("WiFi terputus! Security dinonaktifkan.");
+            mpuEnabled = false;
+            digitalWrite(relayMPUPin, HIGH);  // Matikan relay MPU
+            relayActive = false;
+            
+            // Coba hubungkan kembali
+            WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+        }
+    }
+    
     // Update lastActive dengan unix timestamp
     if (millis() - lastHeartbeatTime >= heartbeatInterval) {
         lastHeartbeatTime = millis();
-        unsigned long epochTime = time(nullptr);
-        if (Firebase.setInt(firebaseData, "/device/lastActive", epochTime)) {
-            Serial.println("Heartbeat sent: " + String(epochTime));
-            // Tambahkan update status Device online saat heartbeat berhasil
-            Firebase.setString(firebaseData, "/logs/systemESP", "Device online");
-            Serial.println("Device status updated: Online");
+        
+        // Cek apakah terhubung ke WiFi
+        if (WiFi.status() == WL_CONNECTED) {
+            unsigned long epochTime = time(nullptr);
+            if (Firebase.setInt(firebaseData, "/device/lastActive", epochTime)) {
+                Serial.println("Heartbeat sent: " + String(epochTime));
+                // Tambahkan update status Device online saat heartbeat berhasil
+                Firebase.setString(firebaseData, "/logs/systemESP", "Device online");
+                Serial.println("Device status updated: Online");
+            } else {
+                Serial.println("Failed to send heartbeat");
+                // Jika gagal mengirim heartbeat, set status offline
+                Firebase.setString(firebaseData, "/logs/systemESP", "Device offline");
+                // Matikan security karena Firebase tidak dapat diakses
+                mpuEnabled = false;
+                digitalWrite(relayMPUPin, HIGH);
+                relayActive = false;
+                Serial.println("Firebase tidak dapat diakses! Security dinonaktifkan.");
+            }
         } else {
-            Serial.println("Failed to send heartbeat");
-            // Jika gagal mengirim heartbeat, set status offline
-            Firebase.setString(firebaseData, "/logs/systemESP", "Device offline");
+            Serial.println("WiFi terputus! Tidak dapat mengirim heartbeat.");
+            // Pastikan security mati ketika WiFi terputus
+            mpuEnabled = false;
+            digitalWrite(relayMPUPin, HIGH);
+            relayActive = false;
         }
     }
 
     // Cek jika tidak ada perubahan dalam 70 detik
     if (millis() - lastHeartbeatTime > 70000) {
-        Firebase.setString(firebaseData, "/logs/systemESP", "Device offline");
+        // WiFi atau Firebase bermasalah, set security off
+        mpuEnabled = false;
+        digitalWrite(relayMPUPin, HIGH);
+        relayActive = false;
+        
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/logs/systemESP", "Device offline");
+        }
     }
 
     // Tambahkan pengecekan status restart di awal loop
-    if (Firebase.getString(firebaseData, "/control/restartESP")) {
+    if (WiFi.status() == WL_CONNECTED && Firebase.getString(firebaseData, "/control/restartESP")) {
         String restartStatus = firebaseData.stringData();
         if (restartStatus == "true") {
             Serial.println("Perintah restart diterima dari Firebase");
@@ -143,8 +185,10 @@ void loop() {
     // Cek auto-restart berdasarkan interval
     if (millis() > restartInterval) {
         Serial.println("Auto-restart setelah " + String(restartInterval/3600000) + " jam");
-        Firebase.setString(firebaseData, "/logs/systemESP", "Device auto-restarting...");
-        delay(1000);
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/logs/systemESP", "Device auto-restarting...");
+            delay(1000);
+        }
         ESP.restart();
     }
 
@@ -153,26 +197,42 @@ void loop() {
         lastI2CCheckTime = millis();
         if (!mpu.testConnection()) {
             Serial.println("MPU6050 tidak merespons! Reset I2C...");
-            Firebase.setString(firebaseData, "/logs/mpu/status", "error");
+            if (WiFi.status() == WL_CONNECTED) {
+                Firebase.setString(firebaseData, "/logs/mpu/status", "error");
+            }
 
             Wire.begin(D2, D1);
             mpu.initialize();
 
             if (mpu.testConnection()) {
-                Firebase.setString(firebaseData, "/logs/mpu/status", "connected");
+                if (WiFi.status() == WL_CONNECTED) {
+                    Firebase.setString(firebaseData, "/logs/mpu/status", "connected");
+                }
             }
         }
     }
 
     // **Baca status MPU dari Firebase**
-    if (Firebase.getString(firebaseData, "/security/status")) {
-        String mpuStatus = firebaseData.stringData();
-        Serial.print("Status MPU dari Firebase: ");
-        Serial.println(mpuStatus);
-        mpuEnabled = (mpuStatus == "on");
+    if (WiFi.status() == WL_CONNECTED) {
+        if (Firebase.getString(firebaseData, "/security/status")) {
+            String mpuStatus = firebaseData.stringData();
+            Serial.print("Status MPU dari Firebase: ");
+            Serial.println(mpuStatus);
+            mpuEnabled = (mpuStatus == "on");
+        } else {
+            Serial.println("Gagal membaca data dari Firebase!");
+            if (WiFi.status() == WL_CONNECTED) {
+                Firebase.setString(firebaseData, "/logs/error", firebaseData.errorReason());
+            }
+            // Matikan security karena Firebase tidak dapat diakses
+            mpuEnabled = false;
+            digitalWrite(relayMPUPin, HIGH);
+            relayActive = false;
+            Serial.println("Firebase tidak dapat diakses! Security dinonaktifkan.");
+        }
     } else {
-        Serial.println("Gagal membaca data dari Firebase!");
-        Firebase.setString(firebaseData, "/logs/error", firebaseData.errorReason());
+        // Pastikan security mati ketika WiFi terputus
+        mpuEnabled = false;
     }
 
     // **Proses MPU6050**
@@ -194,7 +254,9 @@ void loop() {
                 digitalWrite(relayMPUPin, LOW);
                 relayActive = true;
                 relayStartTime = millis();
-                Firebase.setString(firebaseData, "/security/motion", "detected");
+                if (WiFi.status() == WL_CONNECTED) {
+                    Firebase.setString(firebaseData, "/security/motion", "detected");
+                }
             }
 
             if (relayActive && millis() - relayStartTime >= 8000) {
@@ -202,13 +264,17 @@ void loop() {
                 digitalWrite(relayMPUPin, HIGH);
                 relayActive = false;
                 calibrateSensor();
-                Firebase.setString(firebaseData, "/security/motion", "clear");
+                if (WiFi.status() == WL_CONNECTED) {
+                    Firebase.setString(firebaseData, "/security/motion", "clear");
+                }
             }
         }
     } else {
         digitalWrite(relayMPUPin, HIGH);  // Pastikan relay OFF saat disabled
         relayActive = false;
-        Firebase.setString(firebaseData, "/security/motion", "disabled");
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/security/motion", "disabled");
+        }
     }
 
     // **Baca suhu dan kelembaban dari DHT11**
@@ -217,9 +283,16 @@ void loop() {
     
     if (isnan(suhu) || isnan(humidity)) {
         Serial.println("Gagal membaca data dari DHT11!");
-        Firebase.setString(firebaseData, "/logs/dht/status", "error");
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/logs/dht/status", "error");
+        }
     } else {
-        Firebase.setString(firebaseData, "/logs/dht/status", "connected");
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/logs/dht/status", "connected");
+            
+            Firebase.setFloat(firebaseData, "/dht11/temperature", suhu);
+            Firebase.setFloat(firebaseData, "/dht11/humidity", humidity);
+        }
         
         Serial.print("Suhu: ");
         Serial.print(suhu);
@@ -227,19 +300,20 @@ void loop() {
         Serial.print("Kelembaban: ");
         Serial.print(humidity);
         Serial.println(" %");
-        
-        Firebase.setFloat(firebaseData, "/dht11/temperature", suhu);
-        Firebase.setFloat(firebaseData, "/dht11/humidity", humidity);
     }
 
     // **Kendalikan relay kipas**
     if (suhu > 40) {
         Serial.println("Suhu tinggi! Kipas ON.");
         digitalWrite(relayKipasPin, LOW);
-        Firebase.setString(firebaseData, "/security/fan", "ON");
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/security/fan", "ON");
+        }
     } else {
         digitalWrite(relayKipasPin, HIGH);
-        Firebase.setString(firebaseData, "/security/fan", "OFF");
+        if (WiFi.status() == WL_CONNECTED) {
+            Firebase.setString(firebaseData, "/security/fan", "OFF");
+        }
     }
 
     yield();

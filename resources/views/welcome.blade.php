@@ -29,15 +29,19 @@
                     {{-- <a href="{{route('ai.chat')}}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
                         AI
                     </a> --}}
-                    <!-- Notification Button Mobile -->
-                    <button 
-                        @click="isNotificationsPanelOpen = true"
-                        class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
-                    >
+                    <!-- History Button Mobile (Changed from Notification) -->
+                    <a href="{{route('reports')}}" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                    </button>
+                    </a>
+                    <a href="{{ route('view.cards') }}" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 10h16M4 14h6m2 0h6m-16 4h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </a>
+                    
 
                     <!-- Mobile Menu Button -->
                     <button id="mobileMenuBtn" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
@@ -55,15 +59,18 @@
                     </a> --}}
                     
                     
-                    <!-- Notification Button -->
-                    <button 
-                        @click="isNotificationsPanelOpen = true"
-                        class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white"
-                    >
+                    <!-- History Button (Changed from Notification) -->
+                    <a href="{{route('reports')}}" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                    </button>
+                    </a>
+                    <a href="{{ route('view.cards') }}" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 10h16M4 14h6m2 0h6m-16 4h16a2 2 0 002-2V8a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                    </a>
 
                     <!-- Dark Mode Toggle -->
                     <button id="darkModeToggle" class="p-2 text-gray-500 dark:text-gray-400">
@@ -1340,22 +1347,23 @@
 
         // Fungsi untuk memeriksa status online/offline perangkat
         function checkDeviceStatus() {
-            const currentTime = Math.floor(Date.now() / 1000); // Konversi ke detik
+            console.log('Checking device status based on data changes...');
             
             // Tambahkan pengecekan lebih agresif untuk ESP
             database.ref('device/lastActive').once('value', (snapshot) => {
                 const lastActiveESP = snapshot.val();
                 
                 if (lastActiveESP) {
-                    const timeDiff = currentTime - lastActiveESP;
+                    // Ambil nilai data sebelumnya untuk ESP jika tersedia
+                    const previousDataESP = localStorage.getItem('previousESPData');
+                    const currentDataESP = JSON.stringify(lastActiveESP);
                     
-                    console.log('ESP8266 last active: ' + lastActiveESP);
-                    console.log('Current time: ' + currentTime);
-                    console.log('Time difference: ' + timeDiff + ' seconds');
+                    console.log('ESP8266 previous data: ' + previousDataESP);
+                    console.log('ESP8266 current data: ' + currentDataESP);
                     
-                    // Jika perbedaan waktu lebih dari 65 detik, set status offline
-                    if (timeDiff > 60) {
-                        console.log('ESP8266 terdeteksi offline - mengirim status ke Firebase...');
+                    // Jika data tidak berubah sejak pengecekan terakhir, anggap offline
+                    if (previousDataESP && previousDataESP === currentDataESP) {
+                        console.log('ESP8266 terdeteksi offline - tidak ada perubahan data');
                         
                         database.ref('logs/systemESP').set('Device offline')
                             .then(() => {
@@ -1364,6 +1372,13 @@
                             .catch(error => {
                                 console.error('Error updating ESP status:', error);
                             });
+                    } else {
+                        // Data berubah, perangkat dianggap online
+                        console.log('ESP8266 terdeteksi online - data berubah');
+                        database.ref('logs/systemESP').set('Device online');
+                        
+                        // Simpan data saat ini untuk pengecekan berikutnya
+                        localStorage.setItem('previousESPData', currentDataESP);
                     }
                 } else {
                     // Jika lastActive tidak ada, set status offline
@@ -1377,15 +1392,16 @@
                 const lastActiveWemos = snapshot.val();
                 
                 if (lastActiveWemos) {
-                    const timeDiff = currentTime - lastActiveWemos;
+                    // Ambil nilai data sebelumnya untuk Wemos jika tersedia
+                    const previousData = localStorage.getItem('previousWemosData');
+                    const currentData = JSON.stringify(lastActiveWemos);
                     
-                    console.log('Wemos D1 Mini last active: ' + lastActiveWemos);
-                    console.log('Current time: ' + currentTime);
-                    console.log('Time difference: ' + timeDiff + ' seconds');
+                    console.log('Wemos D1 Mini previous data: ' + previousData);
+                    console.log('Wemos D1 Mini current data: ' + currentData);
                     
-                    // Jika perbedaan waktu lebih dari 65 detik, set status offline
-                    if (timeDiff > 60) {
-                        console.log('Wemos D1 Mini terdeteksi offline - mengirim status ke Firebase...');
+                    // Jika data tidak berubah sejak pengecekan terakhir, anggap offline
+                    if (previousData && previousData === currentData) {
+                        console.log('Wemos D1 Mini terdeteksi offline - tidak ada perubahan data');
                         
                         database.ref('logs/systemWemos').set('Device Offline')
                             .then(() => {
@@ -1394,6 +1410,13 @@
                             .catch(error => {
                                 console.error('Error updating Wemos status:', error);
                             });
+                    } else {
+                        // Data berubah, perangkat dianggap online
+                        console.log('Wemos D1 Mini terdeteksi online - data berubah');
+                        database.ref('logs/systemWemos').set('Device Online');
+                        
+                        // Simpan data saat ini untuk pengecekan berikutnya
+                        localStorage.setItem('previousWemosData', currentData);
                     }
                 } else {
                     // Jika lastActiveWemos tidak ada, set status offline
