@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SensorDataController;
 use App\Http\Controllers\ReportController;
-
+use Illuminate\Support\Facades\File;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -23,3 +23,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/sensor-data', [SensorDataController::class, 'getData']);
 Route::get('/reports', [ReportController::class, 'getReports']);
 Route::get('/reports/latest', [ReportController::class, 'getLatestReport']);
+Route::get('/get-reports-json', function () {
+    $path = storage_path('app/reports.json');
+    if (!File::exists($path)) {
+        return response()->json(['error' => 'File not found'], 404);
+    }
+    $content = File::get($path);
+    return response($content)
+        ->header('Content-Type', 'application/json')
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET');
+});
